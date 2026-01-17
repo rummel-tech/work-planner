@@ -46,6 +46,9 @@ class WeekPlanner {
   }
 
   WeekPlanner removeDailyPlanner(int dayOfWeek) {
+    if (dayOfWeek < 0 || dayOfWeek > 6) {
+      throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
+    }
     final updatedPlanners = Map<int, DayPlanner>.from(dailyPlanners);
     updatedPlanners.remove(dayOfWeek);
     return copyWith(dailyPlanners: updatedPlanners);
@@ -60,6 +63,9 @@ class WeekPlanner {
   }
 
   DayPlanner? getDayPlanner(int dayOfWeek) {
+    if (dayOfWeek < 0 || dayOfWeek > 6) {
+      throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
+    }
     return dailyPlanners[dayOfWeek];
   }
 

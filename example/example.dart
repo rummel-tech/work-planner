@@ -51,27 +51,33 @@ void main() {
   );
 
   // Add tasks to the day
-  dayPlanner = dayPlanner.addTask(Task(
-    title: 'Review product specifications',
-    scheduledTime: DateTime(2026, 1, 20, 9, 0),
-    durationMinutes: 60,
-    priority: TaskPriority.high,
-    planId: productLaunchPlan.id,
-  ),);
+  dayPlanner = dayPlanner.addTask(
+    Task(
+      title: 'Review product specifications',
+      scheduledTime: DateTime(2026, 1, 20, 9, 0),
+      durationMinutes: 60,
+      priority: TaskPriority.high,
+      planId: productLaunchPlan.id,
+    ),
+  );
 
-  dayPlanner = dayPlanner.addTask(Task(
-    title: 'Team standup meeting',
-    scheduledTime: DateTime(2026, 1, 20, 10, 0),
-    durationMinutes: 30,
-    priority: TaskPriority.medium,
-  ),);
+  dayPlanner = dayPlanner.addTask(
+    Task(
+      title: 'Team standup meeting',
+      scheduledTime: DateTime(2026, 1, 20, 10, 0),
+      durationMinutes: 30,
+      priority: TaskPriority.medium,
+    ),
+  );
 
-  dayPlanner = dayPlanner.addTask(Task(
-    title: 'Code review session',
-    scheduledTime: DateTime(2026, 1, 20, 14, 0),
-    durationMinutes: 90,
-    priority: TaskPriority.high,
-  ),);
+  dayPlanner = dayPlanner.addTask(
+    Task(
+      title: 'Code review session',
+      scheduledTime: DateTime(2026, 1, 20, 14, 0),
+      durationMinutes: 90,
+      priority: TaskPriority.high,
+    ),
+  );
 
   print('   Date: ${dayPlanner.date.toIso8601String().split('T')[0]}');
   print('   Tasks: ${dayPlanner.tasks.length}');

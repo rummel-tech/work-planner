@@ -62,6 +62,20 @@ void main() {
       expect(updatedPlanner.dailyPlanners, isEmpty);
     });
 
+    test('throws error when removing with invalid day of week', () {
+      final planner = WeekPlanner(weekStartDate: weekStart);
+
+      expect(
+        () => planner.removeDailyPlanner(-1),
+        throwsArgumentError,
+      );
+
+      expect(
+        () => planner.removeDailyPlanner(7),
+        throwsArgumentError,
+      );
+    });
+
     test('gets daily planner by day of week', () {
       final dayPlanner = DayPlanner(date: weekStart);
       final planner = WeekPlanner(
@@ -74,6 +88,20 @@ void main() {
 
       final nonExistent = planner.getDayPlanner(1);
       expect(nonExistent, isNull);
+    });
+
+    test('throws error when getting planner with invalid day of week', () {
+      final planner = WeekPlanner(weekStartDate: weekStart);
+
+      expect(
+        () => planner.getDayPlanner(-1),
+        throwsArgumentError,
+      );
+
+      expect(
+        () => planner.getDayPlanner(7),
+        throwsArgumentError,
+      );
     });
 
     test('adds weekly goal', () {
