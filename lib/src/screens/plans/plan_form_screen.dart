@@ -1,0 +1,301 @@
+import 'package:flutter/material.dart';
+
+import '../../models/plan.dart';
+import '../../services/plan_repository.dart';
+
+class PlanFormScreen extends StatefulWidget {
+  final Plan? plan;
+  final String? goalId;
+
+  const PlanFormScreen({super.key, this.plan, this.goalId});
+
+  @override
+  State<PlanFormScreen> createState() => _PlanFormScreenState();
+}
+
+class _PlanFormScreenState extends State<PlanFormScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _planRepository = PlanRepository();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  PlanStatus _status = PlanStatus.draft;
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  bool get _isEditing => widget.plan != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.plan != null) {
+      _titleController.text = widget.plan!.title;
+      _descriptionController.text = widget.plan!.description;
+      _status = widget.plan!.status;
+      _startDate = widget.plan!.startDate;
+      _endDate = widget.plan!.endDate;
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectStartDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _startDate ?? DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+    );
+    if (date != null) {
+      setState(() {
+        _startDate = date;
+        if (_endDate != null && _endDate!.isBefore(date)) {
+          _endDate = null;
+        }
+      });
+    }
+  }
+
+  Future<void> _selectEndDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _endDate ?? _startDate ?? DateTime.now(),
+      firstDate: _startDate ?? DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+    );
+    if (date != null) {
+      setState(() {
+        _endDate = date;
+      });
+    }
+  }
+
+  Future<void> _savePlan() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    Plan plan;
+    if (_isEditing) {
+      plan = widget.plan!.copyWith(
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        status: _status,
+        startDate: _startDate,
+        endDate: _endDate,
+      );
+    } else {
+      plan = Plan.create(
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        goalId: widget.goalId!,
+        status: _status,
+        startDate: _startDate,
+        endDate: _endDate,
+      );
+    }
+
+    await _planRepository.save(plan);
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.month}/${date.day}/${date.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_isEditing ? 'Edit Plan' : 'New Plan'),
+      ),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'Enter plan title',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  hintText: 'Enter plan description',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a description';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Status',
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: PlanStatus.values.map((status) {
+                  return ChoiceChip(
+                    label: Text(_statusLabel(status)),
+                    selected: _status == status,
+                    onSelected: (_) {
+                      setState(() {
+                        _status = status;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Date Range',
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      child: InkWell(
+                        onTap: _selectStartDate,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Start Date',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.outline,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 16,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _startDate != null
+                                        ? _formatDate(_startDate!)
+                                        : 'Select',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Card(
+                      child: InkWell(
+                        onTap: _selectEndDate,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'End Date',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.outline,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 16,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _endDate != null
+                                        ? _formatDate(_endDate!)
+                                        : 'Select',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (_startDate != null || _endDate != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _startDate = null;
+                        _endDate = null;
+                      });
+                    },
+                    child: const Text('Clear Dates'),
+                  ),
+                ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _savePlan,
+                  child: Text(_isEditing ? 'Save Changes' : 'Create Plan'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _statusLabel(PlanStatus status) {
+    switch (status) {
+      case PlanStatus.draft:
+        return 'Draft';
+      case PlanStatus.active:
+        return 'Active';
+      case PlanStatus.completed:
+        return 'Completed';
+      case PlanStatus.cancelled:
+        return 'Cancelled';
+    }
+  }
+}

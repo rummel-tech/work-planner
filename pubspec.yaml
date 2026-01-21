@@ -4,11 +4,27 @@ version: 0.1.0
 publish_to: 'none'
 
 environment:
-  sdk: '>=2.19.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
 
 dependencies:
+  flutter:
+    sdk: flutter
   uuid: ^4.0.0
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.0
+  rummel_blue_theme:
+    git:
+      url: https://github.com/rummel-tech/resources.git
+      path: rummel_blue_theme
 
 dev_dependencies:
-  test: ^1.24.0
-  lints: ^2.1.0
+  flutter_test:
+    sdk: flutter
+  isar_generator: ^3.1.0+1
+  build_runner: ^2.4.0
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

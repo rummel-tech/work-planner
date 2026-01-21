@@ -1,10 +1,10 @@
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:artemis_work_planner/artemis_work_planner.dart';
 
 void main() {
   group('Goal', () {
     test('creates goal with required fields', () {
-      final goal = Goal(
+      final goal = Goal.create(
         title: 'Launch new product',
         description: 'Launch product by Q2',
         type: GoalType.corporate,
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('creates entrepreneurial goal', () {
-      final goal = Goal(
+      final goal = Goal.create(
         title: 'Start side business',
         description: 'Launch consulting service',
         type: GoalType.entrepreneurial,
@@ -30,7 +30,7 @@ void main() {
 
     test('creates goal with target date', () {
       final targetDate = DateTime(2026, 6, 30);
-      final goal = Goal(
+      final goal = Goal.create(
         title: 'Complete certification',
         description: 'Get AWS certification',
         type: GoalType.corporate,
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('updates goal status with copyWith', () {
-      final goal = Goal(
+      final goal = Goal.create(
         title: 'Complete project',
         description: 'Finish the project',
         type: GoalType.corporate,
@@ -55,14 +55,14 @@ void main() {
     });
 
     test('equality based on id', () {
-      final goal1 = Goal(
+      final goal1 = Goal.create(
         id: 'test-id',
         title: 'Goal 1',
         description: 'Description 1',
         type: GoalType.corporate,
       );
 
-      final goal2 = Goal(
+      final goal2 = Goal.create(
         id: 'test-id',
         title: 'Goal 2',
         description: 'Description 2',
@@ -73,7 +73,7 @@ void main() {
     });
 
     test('toString includes important fields', () {
-      final goal = Goal(
+      final goal = Goal.create(
         title: 'Test Goal',
         description: 'Test',
         type: GoalType.corporate,

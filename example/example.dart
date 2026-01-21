@@ -1,11 +1,14 @@
-import 'package:artemis_work_planner/artemis_work_planner.dart';
+import 'package:artemis_work_planner/src/models/goal.dart';
+import 'package:artemis_work_planner/src/models/plan.dart';
+import 'package:artemis_work_planner/src/planners/day_planner.dart';
+import 'package:artemis_work_planner/src/planners/week_planner.dart';
 
 void main() {
   print('=== Artemis Work Planner Example ===\n');
 
   // 1. Create Goals
   print('1. Creating Goals:');
-  final corporateGoal = Goal(
+  final corporateGoal = Goal.create(
     title: 'Launch Product X',
     description: 'Successfully launch our new product line by Q2 2026',
     type: GoalType.corporate,
@@ -13,7 +16,7 @@ void main() {
   );
   print('   Corporate Goal: ${corporateGoal.title}');
 
-  final entrepreneurialGoal = Goal(
+  final entrepreneurialGoal = Goal.create(
     title: 'Start Consulting Business',
     description: 'Launch independent consulting practice',
     type: GoalType.entrepreneurial,
@@ -23,7 +26,7 @@ void main() {
 
   // 2. Create Plans
   print('2. Creating Plans:');
-  final productLaunchPlan = Plan(
+  final productLaunchPlan = Plan.create(
     title: 'Product X Launch Plan',
     description: 'Detailed plan for product launch',
     goalId: corporateGoal.id,
@@ -45,14 +48,14 @@ void main() {
   // 3. Create Day Planner
   print('3. Creating Day Planner:');
   final today = DateTime(2026, 1, 20);
-  var dayPlanner = DayPlanner(
+  var dayPlanner = DayPlanner.create(
     date: today,
     notes: 'Focus on product development today',
   );
 
   // Add tasks to the day
   dayPlanner = dayPlanner.addTask(
-    Task(
+    Task.create(
       title: 'Review product specifications',
       scheduledTime: DateTime(2026, 1, 20, 9, 0),
       durationMinutes: 60,
@@ -62,7 +65,7 @@ void main() {
   );
 
   dayPlanner = dayPlanner.addTask(
-    Task(
+    Task.create(
       title: 'Team standup meeting',
       scheduledTime: DateTime(2026, 1, 20, 10, 0),
       durationMinutes: 30,
@@ -71,7 +74,7 @@ void main() {
   );
 
   dayPlanner = dayPlanner.addTask(
-    Task(
+    Task.create(
       title: 'Code review session',
       scheduledTime: DateTime(2026, 1, 20, 14, 0),
       durationMinutes: 90,
@@ -94,7 +97,7 @@ void main() {
   // 4. Create Week Planner
   print('4. Creating Week Planner:');
   final weekStart = DateTime(2026, 1, 19); // Monday
-  var weekPlanner = WeekPlanner(
+  var weekPlanner = WeekPlanner.create(
     weekStartDate: weekStart,
     weeklyGoals: [
       'Complete product specification review',
@@ -104,20 +107,17 @@ void main() {
     notes: 'Critical week for product development',
   );
 
-  // Add daily planners for the week
-  weekPlanner = weekPlanner.addDailyPlanner(0, dayPlanner);
+  // Add daily planners for the week (stores references by ID)
+  weekPlanner = weekPlanner.addDailyPlannerEntry(0, dayPlanner.id);
 
-  final tuesdayPlanner = DayPlanner(
+  final tuesdayPlanner = DayPlanner.create(
     date: weekStart.add(const Duration(days: 1)),
   );
-  weekPlanner = weekPlanner.addDailyPlanner(1, tuesdayPlanner);
+  weekPlanner = weekPlanner.addDailyPlannerEntry(1, tuesdayPlanner.id);
 
   print('   Week: ${weekPlanner.weekStartDate.toIso8601String().split('T')[0]} to ${weekPlanner.weekEndDate.toIso8601String().split('T')[0]}');
-  print('   Daily Planners: ${weekPlanner.dailyPlanners.length}');
-  print('   Weekly Goals: ${weekPlanner.weeklyGoals.length}');
-  print('   Total Tasks: ${weekPlanner.totalTasks}');
-  print('   Completed Tasks: ${weekPlanner.completedTasks}');
-  print('   Week Completion Rate: ${(weekPlanner.weekCompletionRate * 100).toStringAsFixed(1)}%\n');
+  print('   Daily Planner Entries: ${weekPlanner.dailyPlannerEntries.length}');
+  print('   Weekly Goals: ${weekPlanner.weeklyGoals.length}\n');
 
   // 5. Update Goal Status
   print('5. Updating Goal Status:');

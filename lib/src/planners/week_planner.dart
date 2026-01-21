@@ -1,57 +1,106 @@
+import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
-import 'day_planner.dart';
+
+part 'week_planner.g.dart';
+
+/// Embedded day planner entry for storing in WeekPlanner
+@embedded
+class DayPlannerEntry {
+  late int dayOfWeek;
+  late String dayPlannerId;
+
+  DayPlannerEntry();
+
+  DayPlannerEntry.create({
+    required this.dayOfWeek,
+    required this.dayPlannerId,
+  });
+}
 
 /// Represents a weekly planner
+@collection
 class WeekPlanner {
-  final String id;
-  final DateTime weekStartDate;
-  final Map<int, DayPlanner> dailyPlanners;
-  final List<String> weeklyGoals;
-  final String? notes;
+  Id isarId = Isar.autoIncrement;
 
-  WeekPlanner({
+  @Index(unique: true)
+  late String id;
+
+  @Index()
+  late DateTime weekStartDate;
+
+  late List<DayPlannerEntry> dailyPlannerEntries;
+  late List<String> weeklyGoals;
+  String? notes;
+
+  WeekPlanner();
+
+  WeekPlanner.create({
     String? id,
-    required this.weekStartDate,
-    Map<int, DayPlanner>? dailyPlanners,
+    required DateTime weekStartDate,
+    List<DayPlannerEntry>? dailyPlannerEntries,
     List<String>? weeklyGoals,
     this.notes,
-  })  : id = id ?? const Uuid().v4(),
-        dailyPlanners = dailyPlanners ?? {},
-        weeklyGoals = weeklyGoals ?? [];
+  }) {
+    this.id = id ?? const Uuid().v4();
+    this.weekStartDate = DateTime(weekStartDate.year, weekStartDate.month, weekStartDate.day);
+    this.dailyPlannerEntries = dailyPlannerEntries ?? [];
+    this.weeklyGoals = weeklyGoals ?? [];
+  }
 
+  @ignore
   DateTime get weekEndDate => weekStartDate.add(const Duration(days: 6));
 
   WeekPlanner copyWith({
     DateTime? weekStartDate,
-    Map<int, DayPlanner>? dailyPlanners,
+    List<DayPlannerEntry>? dailyPlannerEntries,
     List<String>? weeklyGoals,
     String? notes,
   }) {
-    return WeekPlanner(
-      id: id,
-      weekStartDate: weekStartDate ?? this.weekStartDate,
-      dailyPlanners: dailyPlanners ?? this.dailyPlanners,
-      weeklyGoals: weeklyGoals ?? this.weeklyGoals,
-      notes: notes ?? this.notes,
-    );
+    final copy = WeekPlanner()
+      ..isarId = isarId
+      ..id = id
+      ..weekStartDate = weekStartDate ?? this.weekStartDate
+      ..dailyPlannerEntries = dailyPlannerEntries ?? List<DayPlannerEntry>.from(this.dailyPlannerEntries)
+      ..weeklyGoals = weeklyGoals ?? List<String>.from(this.weeklyGoals)
+      ..notes = notes ?? this.notes;
+    return copy;
   }
 
-  WeekPlanner addDailyPlanner(int dayOfWeek, DayPlanner planner) {
+  WeekPlanner addDailyPlannerEntry(int dayOfWeek, String dayPlannerId) {
     if (dayOfWeek < 0 || dayOfWeek > 6) {
       throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
     }
-    final updatedPlanners = Map<int, DayPlanner>.from(dailyPlanners);
-    updatedPlanners[dayOfWeek] = planner;
-    return copyWith(dailyPlanners: updatedPlanners);
+    final updatedEntries = dailyPlannerEntries
+        .where((e) => e.dayOfWeek != dayOfWeek)
+        .toList();
+    updatedEntries.add(DayPlannerEntry.create(
+      dayOfWeek: dayOfWeek,
+      dayPlannerId: dayPlannerId,
+    ));
+    return copyWith(dailyPlannerEntries: updatedEntries);
   }
 
-  WeekPlanner removeDailyPlanner(int dayOfWeek) {
+  WeekPlanner removeDailyPlannerEntry(int dayOfWeek) {
     if (dayOfWeek < 0 || dayOfWeek > 6) {
       throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
     }
-    final updatedPlanners = Map<int, DayPlanner>.from(dailyPlanners);
-    updatedPlanners.remove(dayOfWeek);
-    return copyWith(dailyPlanners: updatedPlanners);
+    final updatedEntries = dailyPlannerEntries
+        .where((e) => e.dayOfWeek != dayOfWeek)
+        .toList();
+    return copyWith(dailyPlannerEntries: updatedEntries);
+  }
+
+  String? getDayPlannerId(int dayOfWeek) {
+    if (dayOfWeek < 0 || dayOfWeek > 6) {
+      throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
+    }
+    try {
+      return dailyPlannerEntries
+          .firstWhere((e) => e.dayOfWeek == dayOfWeek)
+          .dayPlannerId;
+    } catch (_) {
+      return null;
+    }
   }
 
   WeekPlanner addWeeklyGoal(String goal) {
@@ -62,31 +111,9 @@ class WeekPlanner {
     return copyWith(weeklyGoals: weeklyGoals.where((g) => g != goal).toList());
   }
 
-  DayPlanner? getDayPlanner(int dayOfWeek) {
-    if (dayOfWeek < 0 || dayOfWeek > 6) {
-      throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
-    }
-    return dailyPlanners[dayOfWeek];
-  }
-
-  List<Task> getAllTasks() {
-    return dailyPlanners.values
-        .expand((planner) => planner.tasks)
-        .toList();
-  }
-
-  int get totalTasks => getAllTasks().length;
-
-  int get completedTasks => getAllTasks().where((t) => t.completed).length;
-
-  double get weekCompletionRate {
-    if (totalTasks == 0) return 0.0;
-    return completedTasks / totalTasks;
-  }
-
   @override
   String toString() {
-    return 'WeekPlanner(id: $id, weekStart: ${weekStartDate.toIso8601String().split('T')[0]}, dailyPlanners: ${dailyPlanners.length}, weeklyGoals: ${weeklyGoals.length})';
+    return 'WeekPlanner(id: $id, weekStart: ${weekStartDate.toIso8601String().split('T')[0]}, dailyPlanners: ${dailyPlannerEntries.length}, weeklyGoals: ${weeklyGoals.length})';
   }
 
   @override
@@ -96,5 +123,6 @@ class WeekPlanner {
   }
 
   @override
+  @ignore
   int get hashCode => id.hashCode;
 }

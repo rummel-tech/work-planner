@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:artemis_work_planner/artemis_work_planner.dart';
 
 void main() {
@@ -10,102 +10,102 @@ void main() {
     });
 
     test('creates week planner with start date', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
+      final planner = WeekPlanner.create(weekStartDate: weekStart);
 
       expect(planner.id, isNotEmpty);
-      expect(planner.weekStartDate, weekStart);
-      expect(planner.dailyPlanners, isEmpty);
+      expect(planner.weekStartDate.day, weekStart.day);
+      expect(planner.weekStartDate.month, weekStart.month);
+      expect(planner.weekStartDate.year, weekStart.year);
+      expect(planner.dailyPlannerEntries, isEmpty);
       expect(planner.weeklyGoals, isEmpty);
     });
 
     test('calculates week end date', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
+      final planner = WeekPlanner.create(weekStartDate: weekStart);
 
       final expectedEndDate = weekStart.add(const Duration(days: 6));
-      expect(planner.weekEndDate, expectedEndDate);
+      expect(planner.weekEndDate.day, expectedEndDate.day);
+      expect(planner.weekEndDate.month, expectedEndDate.month);
+      expect(planner.weekEndDate.year, expectedEndDate.year);
     });
 
-    test('adds daily planner', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
-      final dayPlanner = DayPlanner(date: weekStart);
+    test('adds daily planner entry', () {
+      final planner = WeekPlanner.create(weekStartDate: weekStart);
+      final dayPlanner = DayPlanner.create(date: weekStart);
 
-      final updatedPlanner = planner.addDailyPlanner(0, dayPlanner);
+      final updatedPlanner = planner.addDailyPlannerEntry(0, dayPlanner.id);
 
-      expect(updatedPlanner.dailyPlanners.length, 1);
-      expect(updatedPlanner.dailyPlanners[0], dayPlanner);
+      expect(updatedPlanner.dailyPlannerEntries.length, 1);
+      expect(updatedPlanner.dailyPlannerEntries.first.dayOfWeek, 0);
+      expect(updatedPlanner.dailyPlannerEntries.first.dayPlannerId, dayPlanner.id);
     });
 
-    test('throws error for invalid day of week', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
-      final dayPlanner = DayPlanner(date: weekStart);
+    test('throws error for invalid day of week when adding', () {
+      final planner = WeekPlanner.create(weekStartDate: weekStart);
 
       expect(
-        () => planner.addDailyPlanner(-1, dayPlanner),
+        () => planner.addDailyPlannerEntry(-1, 'test-id'),
         throwsArgumentError,
       );
 
       expect(
-        () => planner.addDailyPlanner(7, dayPlanner),
+        () => planner.addDailyPlannerEntry(7, 'test-id'),
         throwsArgumentError,
       );
     });
 
-    test('removes daily planner', () {
-      final dayPlanner = DayPlanner(date: weekStart);
-      final planner = WeekPlanner(
-        weekStartDate: weekStart,
-        dailyPlanners: {0: dayPlanner},
-      );
+    test('removes daily planner entry', () {
+      final dayPlanner = DayPlanner.create(date: weekStart);
+      var planner = WeekPlanner.create(weekStartDate: weekStart);
+      planner = planner.addDailyPlannerEntry(0, dayPlanner.id);
 
-      final updatedPlanner = planner.removeDailyPlanner(0);
+      final updatedPlanner = planner.removeDailyPlannerEntry(0);
 
-      expect(updatedPlanner.dailyPlanners, isEmpty);
+      expect(updatedPlanner.dailyPlannerEntries, isEmpty);
     });
 
     test('throws error when removing with invalid day of week', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
+      final planner = WeekPlanner.create(weekStartDate: weekStart);
 
       expect(
-        () => planner.removeDailyPlanner(-1),
+        () => planner.removeDailyPlannerEntry(-1),
         throwsArgumentError,
       );
 
       expect(
-        () => planner.removeDailyPlanner(7),
+        () => planner.removeDailyPlannerEntry(7),
         throwsArgumentError,
       );
     });
 
-    test('gets daily planner by day of week', () {
-      final dayPlanner = DayPlanner(date: weekStart);
-      final planner = WeekPlanner(
-        weekStartDate: weekStart,
-        dailyPlanners: {0: dayPlanner},
-      );
+    test('gets daily planner id by day of week', () {
+      final dayPlanner = DayPlanner.create(date: weekStart);
+      var planner = WeekPlanner.create(weekStartDate: weekStart);
+      planner = planner.addDailyPlannerEntry(0, dayPlanner.id);
 
-      final retrieved = planner.getDayPlanner(0);
-      expect(retrieved, dayPlanner);
+      final retrievedId = planner.getDayPlannerId(0);
+      expect(retrievedId, dayPlanner.id);
 
-      final nonExistent = planner.getDayPlanner(1);
+      final nonExistent = planner.getDayPlannerId(1);
       expect(nonExistent, isNull);
     });
 
     test('throws error when getting planner with invalid day of week', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
+      final planner = WeekPlanner.create(weekStartDate: weekStart);
 
       expect(
-        () => planner.getDayPlanner(-1),
+        () => planner.getDayPlannerId(-1),
         throwsArgumentError,
       );
 
       expect(
-        () => planner.getDayPlanner(7),
+        () => planner.getDayPlannerId(7),
         throwsArgumentError,
       );
     });
 
     test('adds weekly goal', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
+      final planner = WeekPlanner.create(weekStartDate: weekStart);
 
       final updated = planner.addWeeklyGoal('Complete project milestone');
 
@@ -114,7 +114,7 @@ void main() {
     });
 
     test('removes weekly goal', () {
-      final planner = WeekPlanner(
+      final planner = WeekPlanner.create(
         weekStartDate: weekStart,
         weeklyGoals: ['Goal 1', 'Goal 2', 'Goal 3'],
       );
@@ -125,105 +125,22 @@ void main() {
       expect(updated.weeklyGoals, isNot(contains('Goal 2')));
     });
 
-    test('gets all tasks from all daily planners', () {
-      final task1 = Task(title: 'Monday task');
-      final task2 = Task(title: 'Tuesday task 1');
-      final task3 = Task(title: 'Tuesday task 2');
-
-      final mondayPlanner = DayPlanner(
-        date: weekStart,
-        tasks: [task1],
-      );
-
-      final tuesdayPlanner = DayPlanner(
-        date: weekStart.add(const Duration(days: 1)),
-        tasks: [task2, task3],
-      );
-
-      final planner = WeekPlanner(
-        weekStartDate: weekStart,
-        dailyPlanners: {
-          0: mondayPlanner,
-          1: tuesdayPlanner,
-        },
-      );
-
-      final allTasks = planner.getAllTasks();
-      expect(allTasks.length, 3);
-      expect(allTasks, contains(task1));
-      expect(allTasks, contains(task2));
-      expect(allTasks, contains(task3));
-    });
-
-    test('calculates total tasks', () {
-      final task1 = Task(title: 'Task 1');
-      final task2 = Task(title: 'Task 2');
-      final task3 = Task(title: 'Task 3');
-
-      final dayPlanner1 = DayPlanner(date: weekStart, tasks: [task1, task2]);
-      final dayPlanner2 = DayPlanner(
-        date: weekStart.add(const Duration(days: 1)),
-        tasks: [task3],
-      );
-
-      final planner = WeekPlanner(
-        weekStartDate: weekStart,
-        dailyPlanners: {0: dayPlanner1, 1: dayPlanner2},
-      );
-
-      expect(planner.totalTasks, 3);
-    });
-
-    test('calculates completed tasks', () {
-      final task1 = Task(title: 'Task 1', completed: true);
-      final task2 = Task(title: 'Task 2', completed: false);
-      final task3 = Task(title: 'Task 3', completed: true);
-
-      final dayPlanner = DayPlanner(
-        date: weekStart,
-        tasks: [task1, task2, task3],
-      );
-
-      final planner = WeekPlanner(
-        weekStartDate: weekStart,
-        dailyPlanners: {0: dayPlanner},
-      );
-
-      expect(planner.completedTasks, 2);
-    });
-
-    test('calculates week completion rate', () {
-      final task1 = Task(title: 'Task 1', completed: true);
-      final task2 = Task(title: 'Task 2', completed: false);
-      final task3 = Task(title: 'Task 3', completed: true);
-      final task4 = Task(title: 'Task 4', completed: true);
-
-      final dayPlanner = DayPlanner(
-        date: weekStart,
-        tasks: [task1, task2, task3, task4],
-      );
-
-      final planner = WeekPlanner(
-        weekStartDate: weekStart,
-        dailyPlanners: {0: dayPlanner},
-      );
-
-      expect(planner.weekCompletionRate, 0.75);
-    });
-
-    test('completion rate is zero for empty week', () {
-      final planner = WeekPlanner(weekStartDate: weekStart);
-
-      expect(planner.weekCompletionRate, 0.0);
-    });
-
     test('stores notes', () {
-      final planner = WeekPlanner(
+      final planner = WeekPlanner.create(
         weekStartDate: weekStart,
         notes: 'Focus on project X this week',
       );
 
       expect(planner.notes, 'Focus on project X this week');
+    });
+
+    test('replaces existing daily planner entry for same day', () {
+      var planner = WeekPlanner.create(weekStartDate: weekStart);
+      planner = planner.addDailyPlannerEntry(0, 'first-id');
+      planner = planner.addDailyPlannerEntry(0, 'second-id');
+
+      expect(planner.dailyPlannerEntries.length, 1);
+      expect(planner.getDayPlannerId(0), 'second-id');
     });
   });
 }

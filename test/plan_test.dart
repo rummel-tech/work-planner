@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:artemis_work_planner/artemis_work_planner.dart';
 
 void main() {
@@ -6,7 +6,7 @@ void main() {
     late Goal testGoal;
 
     setUp(() {
-      testGoal = Goal(
+      testGoal = Goal.create(
         title: 'Test Goal',
         description: 'A test goal',
         type: GoalType.corporate,
@@ -14,7 +14,7 @@ void main() {
     });
 
     test('creates plan with required fields', () {
-      final plan = Plan(
+      final plan = Plan.create(
         title: 'Q1 Marketing Plan',
         description: 'Execute marketing strategy',
         goalId: testGoal.id,
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('creates plan with steps', () {
-      final plan = Plan(
+      final plan = Plan.create(
         title: 'Development Plan',
         description: 'Build the feature',
         goalId: testGoal.id,
@@ -45,7 +45,7 @@ void main() {
       final startDate = DateTime(2026, 1, 1);
       final endDate = DateTime(2026, 3, 31);
 
-      final plan = Plan(
+      final plan = Plan.create(
         title: 'Q1 Plan',
         description: 'First quarter plan',
         goalId: testGoal.id,
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('adds step to plan', () {
-      final plan = Plan(
+      final plan = Plan.create(
         title: 'Test Plan',
         description: 'Testing',
         goalId: testGoal.id,
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('removes step from plan', () {
-      final plan = Plan(
+      final plan = Plan.create(
         title: 'Test Plan',
         description: 'Testing',
         goalId: testGoal.id,
@@ -88,7 +88,7 @@ void main() {
     });
 
     test('updates plan status with copyWith', () {
-      final plan = Plan(
+      final plan = Plan.create(
         title: 'Test Plan',
         description: 'Testing',
         goalId: testGoal.id,
@@ -101,14 +101,14 @@ void main() {
     });
 
     test('equality based on id', () {
-      final plan1 = Plan(
+      final plan1 = Plan.create(
         id: 'test-id',
         title: 'Plan 1',
         description: 'Description 1',
         goalId: testGoal.id,
       );
 
-      final plan2 = Plan(
+      final plan2 = Plan.create(
         id: 'test-id',
         title: 'Plan 2',
         description: 'Description 2',
@@ -119,7 +119,7 @@ void main() {
     });
 
     test('toString includes important fields', () {
-      final plan = Plan(
+      final plan = Plan.create(
         title: 'Test Plan',
         description: 'Testing',
         goalId: testGoal.id,
