@@ -1,57 +1,73 @@
-import 'package:isar/isar.dart';
+import 'package:sembast/sembast.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/goal.dart';
 import 'database_service.dart';
 import 'api_service.dart';
+import 'connectivity_notifier.dart';
 
 class GoalRepository {
-  final Isar _isar = DatabaseService.instance.isar;
+  final _store = stringMapStoreFactory.store('goals');
+  Database get _db => DatabaseService.instance.db;
   final ApiService? _api;
 
-  /// [api] is optional — when null the repository operates in local-only mode.
   GoalRepository({ApiService? api}) : _api = api;
 
   // ---------------------------------------------------------------------------
-  // Reads — API first, Isar as fallback/cache
+  // Reads — API first, sembast as fallback/cache
   // ---------------------------------------------------------------------------
 
   Future<List<Goal>> getAll() async {
     final api = _api; if (api != null) {
       try {
         final remote = await api.getGoals();
-        final goals = remote.map(_fromJson).toList();
-        await _syncToIsar(goals);
+        ConnectivityNotifier.setOffline(false);
+        final goals = remote.map(_fromApiJson).toList();
+        await _syncToDb(goals);
         return goals;
-      } catch (_) {
-        // Fall through to local cache
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[GoalRepository] API error (falling back to cache): $e');
       }
     }
-    return _isar.goals.where().findAll();
+    final records = await _store.find(_db);
+    return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Goal>> getByType(GoalType type) async {
     final api = _api; if (api != null) {
       try {
         final remote = await api.getGoals(goalType: type.name);
-        final goals = remote.map(_fromJson).toList();
-        await _syncToIsar(goals);
+        ConnectivityNotifier.setOffline(false);
+        final goals = remote.map(_fromApiJson).toList();
+        await _syncToDb(goals);
         return goals;
-      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[GoalRepository] API error (falling back to cache): $e');
+      }
     }
-    return _isar.goals.filter().typeEqualTo(type).findAll();
+    final records = await _store.find(_db,
+        finder: Finder(filter: Filter.equals('type', type.name)));
+    return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Goal>> getByStatus(GoalStatus status) async {
     final api = _api; if (api != null) {
       try {
         final remote = await api.getGoals(status: status.name);
-        final goals = remote.map(_fromJson).toList();
-        await _syncToIsar(goals);
+        ConnectivityNotifier.setOffline(false);
+        final goals = remote.map(_fromApiJson).toList();
+        await _syncToDb(goals);
         return goals;
-      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[GoalRepository] API error (falling back to cache): $e');
+      }
     }
-    return _isar.goals.filter().statusEqualTo(status).findAll();
+    final records = await _store.find(_db,
+        finder: Finder(filter: Filter.equals('status', status.name)));
+    return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Goal>> getActive() async {
@@ -59,25 +75,33 @@ class GoalRepository {
       try {
         final inProgress = await api.getGoals(status: GoalStatus.inProgress.name);
         final notStarted = await api.getGoals(status: GoalStatus.notStarted.name);
-        final goals = [...inProgress, ...notStarted].map(_fromJson).toList();
-        await _syncToIsar(goals);
+        ConnectivityNotifier.setOffline(false);
+        final goals = [...inProgress, ...notStarted].map(_fromApiJson).toList();
+        await _syncToDb(goals);
         return goals;
-      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[GoalRepository] API error (falling back to cache): $e');
+      }
     }
-    return _isar.goals
-        .filter()
-        .statusEqualTo(GoalStatus.inProgress)
-        .or()
-        .statusEqualTo(GoalStatus.notStarted)
-        .findAll();
+    final records = await _store.find(_db,
+        finder: Finder(
+          filter: Filter.or([
+            Filter.equals('status', GoalStatus.inProgress.name),
+            Filter.equals('status', GoalStatus.notStarted.name),
+          ]),
+        ));
+    return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<Goal?> getById(String id) async {
-    return _isar.goals.filter().idEqualTo(id).findFirst();
+    final value = await _store.record(id).get(_db);
+    if (value == null) return null;
+    return _fromLocal(value);
   }
 
   // ---------------------------------------------------------------------------
-  // Writes — API first, sync to Isar on success
+  // Writes — API first, sync to sembast on success
   // ---------------------------------------------------------------------------
 
   Future<Goal> save(Goal goal) async {
@@ -97,14 +121,16 @@ class GoalRepository {
         } else {
           remote = await api.updateGoal(goal.id, body);
         }
-        final synced = _fromJson(remote);
-        await _writeToIsar(synced);
+        ConnectivityNotifier.setOffline(false);
+        final synced = _fromApiJson(remote);
+        await _store.record(synced.id).put(_db, _toLocal(synced));
         return synced;
-      } catch (_) {
-        // Fall through — write locally only
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[GoalRepository] API error (falling back to cache): $e');
       }
     }
-    await _writeToIsar(goal);
+    await _store.record(goal.id).put(_db, _toLocal(goal));
     return goal;
   }
 
@@ -112,29 +138,48 @@ class GoalRepository {
     final api = _api; if (api != null) {
       try {
         await api.deleteGoal(id);
-      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
+      } catch (e) { debugPrint('[GoalRepository] API error: $e'); }
     }
-    await _isar.writeTxn(() => _isar.goals.filter().idEqualTo(id).deleteFirst());
+    await _store.record(id).delete(_db);
   }
 
   Future<void> deleteAll() async {
-    await _isar.writeTxn(() => _isar.goals.clear());
+    await _store.delete(_db);
   }
-
-  // ---------------------------------------------------------------------------
-  // Streams (local Isar only)
-  // ---------------------------------------------------------------------------
-
-  Stream<List<Goal>> watchAll() => _isar.goals.where().watch(fireImmediately: true);
-
-  Stream<List<Goal>> watchByType(GoalType type) =>
-      _isar.goals.filter().typeEqualTo(type).watch(fireImmediately: true);
 
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
 
-  Goal _fromJson(Map<String, dynamic> json) {
+  Map<String, dynamic> _toLocal(Goal goal) => {
+    'id': goal.id,
+    'title': goal.title,
+    'description': goal.description,
+    'createdAt': goal.createdAt.toIso8601String(),
+    'targetDate': goal.targetDate?.toIso8601String(),
+    'status': goal.status.name,
+    'type': goal.type.name,
+  };
+
+  Goal _fromLocal(Map<String, dynamic> json) {
+    return Goal.create(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      targetDate: json['targetDate'] != null ? DateTime.tryParse(json['targetDate'] as String) : null,
+      status: GoalStatus.values.firstWhere(
+        (s) => s.name == json['status'],
+        orElse: () => GoalStatus.notStarted,
+      ),
+      type: GoalType.values.firstWhere(
+        (t) => t.name == json['type'],
+        orElse: () => GoalType.corporate,
+      ),
+    );
+  }
+
+  Goal _fromApiJson(Map<String, dynamic> json) {
     return Goal.create(
       id: json['id'] as String,
       title: json['title'] as String,
@@ -152,14 +197,10 @@ class GoalRepository {
     );
   }
 
-  Future<void> _writeToIsar(Goal goal) async {
-    await _isar.writeTxn(() => _isar.goals.put(goal));
-  }
-
-  Future<void> _syncToIsar(List<Goal> goals) async {
-    await _isar.writeTxn(() async {
+  Future<void> _syncToDb(List<Goal> goals) async {
+    await _db.transaction((txn) async {
       for (final g in goals) {
-        await _isar.goals.put(g);
+        await _store.record(g.id).put(txn, _toLocal(g));
       }
     });
   }

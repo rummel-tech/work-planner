@@ -18,6 +18,7 @@ class WeeklyPlannerScreen extends StatefulWidget {
 class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   final _plannerRepository = ServiceLocator.planners;
   final _goalController = TextEditingController();
+  final _notesController = TextEditingController();
   WeekPlanner? _weekPlanner;
   Map<int, DayPlanner> _dayPlanners = {};
   late DateTime _currentWeekStart;
@@ -33,6 +34,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   @override
   void dispose() {
     _goalController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -53,6 +55,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
       _weekPlanner = planner;
       _dayPlanners = dayPlanners;
       _weekCompletionRate = stats.completionRate;
+      _notesController.text = planner.notes ?? '';
     });
   }
 
@@ -111,8 +114,8 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
     );
 
     if (goal != null && goal.isNotEmpty && _weekPlanner != null) {
-      final updated = _weekPlanner!.addWeeklyGoal(goal);
-      await _plannerRepository.saveWeekPlanner(updated);
+      final updatedGoals = [..._weekPlanner!.weeklyGoals, goal];
+      await _plannerRepository.updateWeekPlannerGoals(_currentWeekStart, updatedGoals);
       _loadWeekPlanner();
     }
   }
@@ -120,9 +123,14 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   Future<void> _removeWeeklyGoal(String goal) async {
     if (_weekPlanner == null) return;
 
-    final updated = _weekPlanner!.removeWeeklyGoal(goal);
-    await _plannerRepository.saveWeekPlanner(updated);
+    final updatedGoals = _weekPlanner!.weeklyGoals.where((g) => g != goal).toList();
+    await _plannerRepository.updateWeekPlannerGoals(_currentWeekStart, updatedGoals);
     _loadWeekPlanner();
+  }
+
+  Future<void> _saveNotes() async {
+    if (_weekPlanner == null) return;
+    await _plannerRepository.updateWeekPlannerNotes(_currentWeekStart, _notesController.text);
   }
 
   String _formatWeekRange() {
@@ -272,6 +280,31 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
                               ),
                             ),
                           ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Notes', style: theme.textTheme.titleSmall),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _notesController,
+                          decoration: const InputDecoration(
+                            hintText: 'Notes for this week...',
+                            border: OutlineInputBorder(),
+                          ),
+                          maxLines: 3,
+                          onChanged: (_) => _saveNotes(),
+                        ),
                       ],
                     ),
                   ),

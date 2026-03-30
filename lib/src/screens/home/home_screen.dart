@@ -1,5 +1,5 @@
-import '../../models/plan.dart';
 import '../../services/service_locator.dart';
+import '../../services/connectivity_notifier.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/goal.dart';
@@ -252,13 +252,42 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Work Planner'),
       ),
-      body: IndexedStack(
-        index: _currentIndex,
+      body: Column(
         children: [
-          _buildDashboard(),
-          _GoalsTab(onDataChanged: _loadData),
-          _WeeklyTab(onDataChanged: _loadData),
-          _TodayTab(onDataChanged: _loadData),
+          ValueListenableBuilder<bool>(
+            valueListenable: ConnectivityNotifier.isOffline,
+            builder: (context, isOffline, _) {
+              if (!isOffline) return const SizedBox.shrink();
+              return Container(
+                width: double.infinity,
+                color: Colors.orange.shade100,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: Row(
+                  children: [
+                    const Icon(Icons.wifi_off, size: 16, color: Colors.orange),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Offline — showing cached data',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.orange.shade900,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: [
+                _buildDashboard(),
+                _GoalsTab(onDataChanged: _loadData),
+                _WeeklyTab(onDataChanged: _loadData),
+                _TodayTab(onDataChanged: _loadData),
+              ],
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(

@@ -11,6 +11,7 @@ import '../screens/goals/goal_detail_screen.dart';
 import '../screens/goals/goal_form_screen.dart';
 import '../screens/plans/plan_detail_screen.dart';
 import '../screens/plans/plan_form_screen.dart';
+import '../screens/plans/plans_screen.dart';
 import '../screens/daily/day_planner_screen.dart';
 import '../screens/daily/task_form_screen.dart';
 import '../screens/weekly/weekly_planner_screen.dart';
@@ -25,6 +26,7 @@ class AppRouter {
   static const String home = '/';
   static const String goalDetail = '/goal';
   static const String goalForm = '/goal/form';
+  static const String plans = '/plans';
   static const String planDetail = '/plan';
   static const String planForm = '/plan/form';
   static const String dayPlanner = '/day';
@@ -55,6 +57,10 @@ class AppRouter {
         final goal = settings.arguments as Goal?;
         return MaterialPageRoute(builder: (_) => GoalFormScreen(goal: goal));
 
+      case plans:
+        final goalId = settings.arguments as String;
+        return MaterialPageRoute(builder: (_) => PlansScreen(goalId: goalId));
+
       case planDetail:
         final plan = settings.arguments as Plan;
         return MaterialPageRoute(builder: (_) => PlanDetailScreen(plan: plan));
@@ -78,6 +84,8 @@ class AppRouter {
           builder: (_) => TaskFormScreen(
             task: args['task'] as Task?,
             date: args['date'] as DateTime,
+            initialPlanId: args['planId'] as String?,
+            initialPomodoroBlock: args['pomodoroBlock'] as int?,
           ),
         );
 

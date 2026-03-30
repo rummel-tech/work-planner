@@ -44,11 +44,14 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   }
 
   Future<void> _selectDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final initial = _targetDate ?? today;
     final date = await showDatePicker(
       context: context,
-      initialDate: _targetDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+      initialDate: initial,
+      firstDate: _isEditing ? DateTime(2000) : today,
+      lastDate: today.add(const Duration(days: 365 * 5)),
     );
     if (date != null) {
       setState(() {

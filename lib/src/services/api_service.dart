@@ -114,6 +114,24 @@ class ApiService {
     return await _get('/week-planners/$weekStartDate/stats') as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> updateWeekPlanner(String weekStartDate, {List<String>? weeklyGoals, String? notes}) async {
+    return await _patch('/week-planners/$weekStartDate', {
+      if (weeklyGoals != null) 'weekly_goals': weeklyGoals,
+      if (notes != null) 'notes': notes,
+    }) as Map<String, dynamic>;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tasks (list)
+  // ---------------------------------------------------------------------------
+
+  Future<List<Map<String, dynamic>>> getTasks({String? planId}) async {
+    var path = '/tasks';
+    if (planId != null) path += '?plan_id=${Uri.encodeComponent(planId)}';
+    final resp = await _get(path);
+    return (resp as List).cast<Map<String, dynamic>>();
+  }
+
   // ---------------------------------------------------------------------------
   // HTTP helpers
   // ---------------------------------------------------------------------------

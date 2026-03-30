@@ -23,6 +23,7 @@ export 'src/services/goal_repository.dart';
 export 'src/services/plan_repository.dart';
 export 'src/services/planner_repository.dart';
 export 'src/services/service_locator.dart';
+export 'src/services/connectivity_notifier.dart';
 
 // Navigation
 export 'src/navigation/app_router.dart';

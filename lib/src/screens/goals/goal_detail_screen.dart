@@ -233,9 +233,23 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Plans',
-                    style: theme.textTheme.titleMedium,
+                  TextButton(
+                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                    onPressed: () async {
+                      await Navigator.pushNamed(
+                        context,
+                        AppRouter.plans,
+                        arguments: _goal.id,
+                      );
+                      _loadPlans();
+                    },
+                    child: Row(
+                      children: [
+                        Text('Plans', style: theme.textTheme.titleMedium),
+                        const SizedBox(width: 4),
+                        Icon(Icons.chevron_right, size: 18, color: theme.colorScheme.primary),
+                      ],
+                    ),
                   ),
                   TextButton.icon(
                     onPressed: () async {

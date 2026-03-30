@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../services/service_locator.dart';
 import '../../navigation/app_router.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _codeController = TextEditingController();
-  final _authService = AuthService();
+  final _authService = ServiceLocator.auth;
 
   bool _loading = false;
   bool _obscurePassword = true;

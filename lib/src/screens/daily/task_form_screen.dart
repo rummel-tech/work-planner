@@ -7,8 +7,10 @@ import '../../models/plan.dart';
 class TaskFormScreen extends StatefulWidget {
   final Task? task;
   final DateTime date;
+  final String? initialPlanId;
+  final int? initialPomodoroBlock;
 
-  const TaskFormScreen({super.key, this.task, required this.date});
+  const TaskFormScreen({super.key, this.task, required this.date, this.initialPlanId, this.initialPomodoroBlock});
 
   @override
   State<TaskFormScreen> createState() => _TaskFormScreenState();
@@ -25,6 +27,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   TimeOfDay? _scheduledTime;
   int? _durationMinutes;
   String? _planId;
+  int? _pomodoroBlock;
   List<Plan> _availablePlans = [];
 
   bool get _isEditing => widget.task != null;
@@ -33,12 +36,15 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   void initState() {
     super.initState();
     _loadPlans();
+    _planId = widget.initialPlanId;
+    _pomodoroBlock = widget.initialPomodoroBlock;
     if (widget.task != null) {
       _titleController.text = widget.task!.title;
       _descriptionController.text = widget.task!.description ?? '';
       _priority = widget.task!.priority;
-      _planId = widget.task!.planId;
+      _planId = widget.task!.planId ?? widget.initialPlanId;
       _durationMinutes = widget.task!.durationMinutes;
+      _pomodoroBlock = widget.task!.pomodoroBlock ?? widget.initialPomodoroBlock;
       if (widget.task!.scheduledTime != null) {
         _scheduledTime = TimeOfDay(
           hour: widget.task!.scheduledTime!.hour,
@@ -98,6 +104,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         scheduledTime: scheduledDateTime,
         durationMinutes: _durationMinutes,
         planId: _planId,
+        pomodoroBlock: _pomodoroBlock,
+        clearPomodoroBlock: _pomodoroBlock == null,
       );
       await _plannerRepository.updateTask(widget.date, updatedTask);
     } else {
@@ -110,6 +118,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         scheduledTime: scheduledDateTime,
         durationMinutes: _durationMinutes,
         planId: _planId,
+        pomodoroBlock: _pomodoroBlock,
       );
       await _plannerRepository.addTask(widget.date, newTask);
     }
@@ -325,6 +334,28 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                     child: const Text('Clear Time'),
                   ),
                 ),
+              const SizedBox(height: 24),
+              Text(
+                'Pomodoro Block (optional)',
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                children: [
+                  ChoiceChip(
+                    label: const Text('None'),
+                    selected: _pomodoroBlock == null,
+                    onSelected: (_) => setState(() => _pomodoroBlock = null),
+                  ),
+                  for (int i = 1; i <= 4; i++)
+                    ChoiceChip(
+                      label: Text('Block $i'),
+                      selected: _pomodoroBlock == i,
+                      onSelected: (_) => setState(() => _pomodoroBlock = i),
+                    ),
+                ],
+              ),
               const SizedBox(height: 24),
               Text(
                 'Link to Plan (optional)',

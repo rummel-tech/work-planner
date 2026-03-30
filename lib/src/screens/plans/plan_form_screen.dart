@@ -1,4 +1,3 @@
-import '../../models/goal.dart';
 import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
@@ -46,11 +45,13 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
   }
 
   Future<void> _selectStartDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final date = await showDatePicker(
       context: context,
-      initialDate: _startDate ?? DateTime.now(),
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+      initialDate: _startDate ?? today,
+      firstDate: _isEditing ? DateTime(2000) : today.subtract(const Duration(days: 365)),
+      lastDate: today.add(const Duration(days: 365 * 5)),
     );
     if (date != null) {
       setState(() {
@@ -63,11 +64,15 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
   }
 
   Future<void> _selectEndDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final fallbackFirst = _isEditing ? DateTime(2000) : today;
+    final firstDate = _startDate ?? fallbackFirst;
     final date = await showDatePicker(
       context: context,
-      initialDate: _endDate ?? _startDate ?? DateTime.now(),
-      firstDate: _startDate ?? DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+      initialDate: _endDate ?? _startDate ?? today,
+      firstDate: firstDate,
+      lastDate: today.add(const Duration(days: 365 * 5)),
     );
     if (date != null) {
       setState(() {

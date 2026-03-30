@@ -2,7 +2,9 @@ import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/plan.dart';
+import '../../planners/day_planner.dart';
 import '../../ui_components/status_chip.dart';
+import '../../ui_components/task_tile.dart';
 import '../../navigation/app_router.dart';
 
 class PlanDetailScreen extends StatefulWidget {
@@ -16,13 +18,23 @@ class PlanDetailScreen extends StatefulWidget {
 
 class _PlanDetailScreenState extends State<PlanDetailScreen> {
   final _planRepository = ServiceLocator.plans;
+  final _plannerRepository = ServiceLocator.planners;
   late Plan _plan;
+  List<Task> _linkedTasks = [];
   final _stepController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _plan = widget.plan;
+    _loadLinkedTasks();
+  }
+
+  Future<void> _loadLinkedTasks() async {
+    final tasks = await _plannerRepository.getTasksForPlan(_plan.id);
+    setState(() {
+      _linkedTasks = tasks;
+    });
   }
 
   @override
@@ -38,6 +50,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         _plan = plan;
       });
     }
+    await _loadLinkedTasks();
   }
 
   Future<void> _updateStatus(PlanStatus status) async {
@@ -139,6 +152,25 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       await _planRepository.delete(_plan.id);
       Navigator.pop(context);
     }
+  }
+
+  Future<void> _addTask() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final date = await showDatePicker(
+      context: context,
+      initialDate: today,
+      firstDate: DateTime(2000),
+      lastDate: today.add(const Duration(days: 365 * 5)),
+      helpText: 'Select task date',
+    );
+    if (date == null || !mounted) return;
+    await Navigator.pushNamed(
+      context,
+      AppRouter.taskForm,
+      arguments: {'date': date, 'planId': _plan.id},
+    );
+    _loadLinkedTasks();
   }
 
   String _formatDate(DateTime? date) {
@@ -330,6 +362,38 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                     );
                   },
                 ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Linked Tasks (${_linkedTasks.length})',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  TextButton.icon(
+                    onPressed: _addTask,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Task'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              if (_linkedTasks.isEmpty)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(
+                      child: Text(
+                        'No tasks linked to this plan yet',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.outline,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                ..._linkedTasks.map((task) => TaskTile(task: task)),
             ],
           ),
         ),

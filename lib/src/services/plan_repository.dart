@@ -1,12 +1,14 @@
-import 'package:isar/isar.dart';
+import 'package:sembast/sembast.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/plan.dart';
 import 'database_service.dart';
 import 'api_service.dart';
+import 'connectivity_notifier.dart';
 
 class PlanRepository {
-  final Isar _isar = DatabaseService.instance.isar;
+  final _store = stringMapStoreFactory.store('plans');
+  Database get _db => DatabaseService.instance.db;
   final ApiService? _api;
 
   PlanRepository({ApiService? api}) : _api = api;
@@ -19,45 +21,66 @@ class PlanRepository {
     final api = _api; if (api != null) {
       try {
         final remote = await api.getPlans();
-        final plans = remote.map(_fromJson).toList();
-        await _syncToIsar(plans);
+        ConnectivityNotifier.setOffline(false);
+        final plans = remote.map(_fromApiJson).toList();
+        await _syncToDb(plans);
         return plans;
-      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[PlanRepository] API error (falling back to cache): $e');
+      }
     }
-    return _isar.plans.where().findAll();
+    final records = await _store.find(_db);
+    return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Plan>> getByGoalId(String goalId) async {
     final api = _api; if (api != null) {
       try {
         final remote = await api.getPlans(goalId: goalId);
-        final plans = remote.map(_fromJson).toList();
-        await _syncToIsar(plans);
+        ConnectivityNotifier.setOffline(false);
+        final plans = remote.map(_fromApiJson).toList();
+        await _syncToDb(plans);
         return plans;
-      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[PlanRepository] API error (falling back to cache): $e');
+      }
     }
-    return _isar.plans.filter().goalIdEqualTo(goalId).findAll();
+    final records = await _store.find(_db,
+        finder: Finder(filter: Filter.equals('goalId', goalId)));
+    return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Plan>> getByStatus(PlanStatus status) async {
     final api = _api; if (api != null) {
       try {
         final remote = await api.getPlans(status: status.name);
-        final plans = remote.map(_fromJson).toList();
-        await _syncToIsar(plans);
+        ConnectivityNotifier.setOffline(false);
+        final plans = remote.map(_fromApiJson).toList();
+        await _syncToDb(plans);
         return plans;
-      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[PlanRepository] API error (falling back to cache): $e');
+      }
     }
-    return _isar.plans.filter().statusEqualTo(status).findAll();
+    final records = await _store.find(_db,
+        finder: Finder(filter: Filter.equals('status', status.name)));
+    return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Plan>> getActive() async => getByStatus(PlanStatus.active);
 
-  Future<Plan?> getById(String id) async =>
-      _isar.plans.filter().idEqualTo(id).findFirst();
+  Future<Plan?> getById(String id) async {
+    final value = await _store.record(id).get(_db);
+    if (value == null) return null;
+    return _fromLocal(value);
+  }
 
-  Future<int> countByGoalId(String goalId) async =>
-      _isar.plans.filter().goalIdEqualTo(goalId).count();
+  Future<int> countByGoalId(String goalId) async {
+    return _store.count(_db, filter: Filter.equals('goalId', goalId));
+  }
 
   // ---------------------------------------------------------------------------
   // Writes
@@ -82,12 +105,16 @@ class PlanRepository {
         } else {
           remote = await api.updatePlan(plan.id, body);
         }
-        final synced = _fromJson(remote);
-        await _writeToIsar(synced);
+        ConnectivityNotifier.setOffline(false);
+        final synced = _fromApiJson(remote);
+        await _store.record(synced.id).put(_db, _toLocal(synced));
         return synced;
-      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
+      } catch (e) {
+        if (e is ApiNetworkException) ConnectivityNotifier.setOffline(true);
+        debugPrint('[PlanRepository] API error (falling back to cache): $e');
+      }
     }
-    await _writeToIsar(plan);
+    await _store.record(plan.id).put(_db, _toLocal(plan));
     return plan;
   }
 
@@ -95,42 +122,62 @@ class PlanRepository {
     final api = _api; if (api != null) {
       try {
         await api.deletePlan(id);
-      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
+      } catch (e) { debugPrint('[PlanRepository] API error: $e'); }
     }
-    await _isar.writeTxn(() => _isar.plans.filter().idEqualTo(id).deleteFirst());
+    await _store.record(id).delete(_db);
   }
 
   Future<void> deleteByGoalId(String goalId) async {
-    final plans = await _isar.plans.filter().goalIdEqualTo(goalId).findAll();
+    final plans = await getByGoalId(goalId);
     final api = _api; if (api != null) {
       for (final p in plans) {
         try {
           await api.deletePlan(p.id);
-        } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
+        } catch (e) { debugPrint('[PlanRepository] API error: $e'); }
       }
     }
-    await _isar.writeTxn(() => _isar.plans.filter().goalIdEqualTo(goalId).deleteAll());
+    await _store.delete(_db,
+        finder: Finder(filter: Filter.equals('goalId', goalId)));
   }
 
   Future<void> deleteAll() async {
-    await _isar.writeTxn(() => _isar.plans.clear());
+    await _store.delete(_db);
   }
-
-  // ---------------------------------------------------------------------------
-  // Streams
-  // ---------------------------------------------------------------------------
-
-  Stream<List<Plan>> watchAll() => _isar.plans.where().watch(fireImmediately: true);
-
-  Stream<List<Plan>> watchByGoalId(String goalId) =>
-      _isar.plans.filter().goalIdEqualTo(goalId).watch(fireImmediately: true);
 
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
 
-  Plan _fromJson(Map<String, dynamic> json) {
-    final steps = (json['steps'] as List?)?.cast<String>() ?? <String>[];
+  Map<String, dynamic> _toLocal(Plan plan) => {
+    'id': plan.id,
+    'title': plan.title,
+    'description': plan.description,
+    'goalId': plan.goalId,
+    'createdAt': plan.createdAt.toIso8601String(),
+    'startDate': plan.startDate?.toIso8601String(),
+    'endDate': plan.endDate?.toIso8601String(),
+    'steps': plan.steps,
+    'status': plan.status.name,
+  };
+
+  Plan _fromLocal(Map<String, dynamic> json) {
+    return Plan.create(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String? ?? '',
+      goalId: json['goalId'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      startDate: json['startDate'] != null ? DateTime.tryParse(json['startDate'] as String) : null,
+      endDate: json['endDate'] != null ? DateTime.tryParse(json['endDate'] as String) : null,
+      steps: (json['steps'] as List?)?.cast<String>() ?? [],
+      status: PlanStatus.values.firstWhere(
+        (s) => s.name == json['status'],
+        orElse: () => PlanStatus.draft,
+      ),
+    );
+  }
+
+  Plan _fromApiJson(Map<String, dynamic> json) {
     return Plan.create(
       id: json['id'] as String,
       goalId: json['goal_id'] as String,
@@ -139,7 +186,7 @@ class PlanRepository {
       createdAt: DateTime.parse(json['created_at'] as String),
       startDate: json['start_date'] != null ? DateTime.tryParse(json['start_date'] as String) : null,
       endDate: json['end_date'] != null ? DateTime.tryParse(json['end_date'] as String) : null,
-      steps: steps,
+      steps: (json['steps'] as List?)?.cast<String>() ?? [],
       status: PlanStatus.values.firstWhere(
         (s) => s.name == json['status'],
         orElse: () => PlanStatus.draft,
@@ -147,14 +194,10 @@ class PlanRepository {
     );
   }
 
-  Future<void> _writeToIsar(Plan plan) async {
-    await _isar.writeTxn(() => _isar.plans.put(plan));
-  }
-
-  Future<void> _syncToIsar(List<Plan> plans) async {
-    await _isar.writeTxn(() async {
+  Future<void> _syncToDb(List<Plan> plans) async {
+    await _db.transaction((txn) async {
       for (final p in plans) {
-        await _isar.plans.put(p);
+        await _store.record(p.id).put(txn, _toLocal(p));
       }
     });
   }

@@ -1,28 +1,24 @@
-import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
-part 'goal.g.dart';
-
 /// Represents a goal in the work planning system
-@collection
 class Goal {
-  Id isarId = Isar.autoIncrement;
+  final String id;
+  final String title;
+  final String description;
+  final DateTime createdAt;
+  final DateTime? targetDate;
+  final GoalStatus status;
+  final GoalType type;
 
-  @Index(unique: true)
-  late String id;
-
-  late String title;
-  late String description;
-  late DateTime createdAt;
-  DateTime? targetDate;
-
-  @enumerated
-  late GoalStatus status;
-
-  @enumerated
-  late GoalType type;
-
-  Goal();
+  const Goal._({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.createdAt,
+    this.targetDate,
+    required this.status,
+    required this.type,
+  });
 
   Goal.create({
     String? id,
@@ -32,15 +28,15 @@ class Goal {
     DateTime? targetDate,
     GoalStatus status = GoalStatus.notStarted,
     required GoalType type,
-  }) {
-    this.id = id ?? const Uuid().v4();
-    this.title = title;
-    this.description = description;
-    this.createdAt = createdAt ?? DateTime.now();
-    this.targetDate = targetDate;
-    this.status = status;
-    this.type = type;
-  }
+  }) : this._(
+          id: id ?? const Uuid().v4(),
+          title: title,
+          description: description,
+          createdAt: createdAt ?? DateTime.now(),
+          targetDate: targetDate,
+          status: status,
+          type: type,
+        );
 
   Goal copyWith({
     String? title,
@@ -49,16 +45,15 @@ class Goal {
     GoalStatus? status,
     GoalType? type,
   }) {
-    final copy = Goal()
-      ..isarId = isarId
-      ..id = id
-      ..title = title ?? this.title
-      ..description = description ?? this.description
-      ..createdAt = createdAt
-      ..targetDate = targetDate ?? this.targetDate
-      ..status = status ?? this.status
-      ..type = type ?? this.type;
-    return copy;
+    return Goal._(
+      id: id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      createdAt: createdAt,
+      targetDate: targetDate ?? this.targetDate,
+      status: status ?? this.status,
+      type: type ?? this.type,
+    );
   }
 
   @override
@@ -73,7 +68,6 @@ class Goal {
   }
 
   @override
-  @ignore
   int get hashCode => id.hashCode;
 }
 

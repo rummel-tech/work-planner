@@ -25,7 +25,20 @@
       "Bash(grep -E \"\\\\.py$\")",
       "Bash(find:*)",
       "Bash(grep -r alembic /home/shawn/_Projects/services/work-planner --include=*.py)",
-      "Bash(grep -E \"\\\\.env|Makefile|Procfile|\\\\.sh$\")"
+      "Bash(grep -E \"\\\\.env|Makefile|Procfile|\\\\.sh$\")",
+      "Bash(flutter create:*)",
+      "Bash(flutter run:*)",
+      "Bash(flutter devices:*)",
+      "Bash(ld --version)",
+      "Bash(sudo ln:*)",
+      "Bash(flutter --version)",
+      "Bash(snap connections:*)",
+      "Bash(curl -s http://localhost:8040/health)",
+      "Bash(curl -s -X POST http://localhost:8040/auth/register -H \"Content-Type: application/json\" -d '{\"\"\"\"email\"\"\"\":\"\"\"\"dev@test.com\"\"\"\",\"\"\"\"password\"\"\"\":\"\"\"\"devpass123\"\"\"\",\"\"\"\"full_name\"\"\"\":\"\"\"\"Dev User\"\"\"\"}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(BOOTSTRAP_EMAIL=dev@test.com BOOTSTRAP_PASSWORD=devpass123 python scripts/bootstrap.py --codes 0)",
+      "Bash(jobs -l)"
     ]
   }
 }

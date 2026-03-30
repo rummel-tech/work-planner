@@ -1,15 +1,14 @@
-import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
-part 'week_planner.g.dart';
-
 /// Embedded day planner entry for storing in WeekPlanner
-@embedded
 class DayPlannerEntry {
-  late int dayOfWeek;
-  late String dayPlannerId;
+  final int dayOfWeek;
+  final String dayPlannerId;
 
-  DayPlannerEntry();
+  const DayPlannerEntry({
+    required this.dayOfWeek,
+    required this.dayPlannerId,
+  });
 
   DayPlannerEntry.create({
     required this.dayOfWeek,
@@ -18,36 +17,35 @@ class DayPlannerEntry {
 }
 
 /// Represents a weekly planner
-@collection
 class WeekPlanner {
-  Id isarId = Isar.autoIncrement;
+  final String id;
+  final DateTime weekStartDate;
+  final List<DayPlannerEntry> dailyPlannerEntries;
+  final List<String> weeklyGoals;
+  final String? notes;
 
-  @Index(unique: true)
-  late String id;
-
-  @Index()
-  late DateTime weekStartDate;
-
-  late List<DayPlannerEntry> dailyPlannerEntries;
-  late List<String> weeklyGoals;
-  String? notes;
-
-  WeekPlanner();
+  const WeekPlanner._({
+    required this.id,
+    required this.weekStartDate,
+    required this.dailyPlannerEntries,
+    required this.weeklyGoals,
+    this.notes,
+  });
 
   WeekPlanner.create({
     String? id,
     required DateTime weekStartDate,
     List<DayPlannerEntry>? dailyPlannerEntries,
     List<String>? weeklyGoals,
-    this.notes,
-  }) {
-    this.id = id ?? const Uuid().v4();
-    this.weekStartDate = DateTime(weekStartDate.year, weekStartDate.month, weekStartDate.day);
-    this.dailyPlannerEntries = dailyPlannerEntries ?? [];
-    this.weeklyGoals = weeklyGoals ?? [];
-  }
+    String? notes,
+  }) : this._(
+          id: id ?? const Uuid().v4(),
+          weekStartDate: DateTime(weekStartDate.year, weekStartDate.month, weekStartDate.day),
+          dailyPlannerEntries: dailyPlannerEntries ?? const [],
+          weeklyGoals: weeklyGoals ?? const [],
+          notes: notes,
+        );
 
-  @ignore
   DateTime get weekEndDate => weekStartDate.add(const Duration(days: 6));
 
   WeekPlanner copyWith({
@@ -56,14 +54,13 @@ class WeekPlanner {
     List<String>? weeklyGoals,
     String? notes,
   }) {
-    final copy = WeekPlanner()
-      ..isarId = isarId
-      ..id = id
-      ..weekStartDate = weekStartDate ?? this.weekStartDate
-      ..dailyPlannerEntries = dailyPlannerEntries ?? List<DayPlannerEntry>.from(this.dailyPlannerEntries)
-      ..weeklyGoals = weeklyGoals ?? List<String>.from(this.weeklyGoals)
-      ..notes = notes ?? this.notes;
-    return copy;
+    return WeekPlanner._(
+      id: id,
+      weekStartDate: weekStartDate ?? this.weekStartDate,
+      dailyPlannerEntries: dailyPlannerEntries ?? List<DayPlannerEntry>.from(this.dailyPlannerEntries),
+      weeklyGoals: weeklyGoals ?? List<String>.from(this.weeklyGoals),
+      notes: notes ?? this.notes,
+    );
   }
 
   WeekPlanner addDailyPlannerEntry(int dayOfWeek, String dayPlannerId) {
@@ -123,6 +120,5 @@ class WeekPlanner {
   }
 
   @override
-  @ignore
   int get hashCode => id.hashCode;
 }

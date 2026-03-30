@@ -38,7 +38,7 @@ void main() async {
     plannerRepo: PlannerRepository(api: apiService),
   );
 
-  // Initialise local Isar database (used as offline cache)
+  // Initialise local sembast database (used as offline cache)
   await DatabaseService.instance.initialize();
 
   // Determine initial route based on auth state

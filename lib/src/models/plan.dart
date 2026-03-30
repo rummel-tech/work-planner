@@ -1,31 +1,28 @@
-import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
-part 'plan.g.dart';
-
 /// Represents a plan to achieve a goal
-@collection
 class Plan {
-  Id isarId = Isar.autoIncrement;
+  final String id;
+  final String title;
+  final String description;
+  final String goalId;
+  final DateTime createdAt;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final List<String> steps;
+  final PlanStatus status;
 
-  @Index(unique: true)
-  late String id;
-
-  late String title;
-  late String description;
-
-  @Index()
-  late String goalId;
-
-  late DateTime createdAt;
-  DateTime? startDate;
-  DateTime? endDate;
-  late List<String> steps;
-
-  @enumerated
-  late PlanStatus status;
-
-  Plan();
+  const Plan._({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.goalId,
+    required this.createdAt,
+    this.startDate,
+    this.endDate,
+    required this.steps,
+    required this.status,
+  });
 
   Plan.create({
     String? id,
@@ -37,17 +34,17 @@ class Plan {
     DateTime? endDate,
     List<String>? steps,
     PlanStatus status = PlanStatus.draft,
-  }) {
-    this.id = id ?? const Uuid().v4();
-    this.title = title;
-    this.description = description;
-    this.goalId = goalId;
-    this.createdAt = createdAt ?? DateTime.now();
-    this.startDate = startDate;
-    this.endDate = endDate;
-    this.steps = steps ?? [];
-    this.status = status;
-  }
+  }) : this._(
+          id: id ?? const Uuid().v4(),
+          title: title,
+          description: description,
+          goalId: goalId,
+          createdAt: createdAt ?? DateTime.now(),
+          startDate: startDate,
+          endDate: endDate,
+          steps: steps ?? const [],
+          status: status,
+        );
 
   Plan copyWith({
     String? title,
@@ -58,18 +55,17 @@ class Plan {
     List<String>? steps,
     PlanStatus? status,
   }) {
-    final copy = Plan()
-      ..isarId = isarId
-      ..id = id
-      ..title = title ?? this.title
-      ..description = description ?? this.description
-      ..goalId = goalId ?? this.goalId
-      ..createdAt = createdAt
-      ..startDate = startDate ?? this.startDate
-      ..endDate = endDate ?? this.endDate
-      ..steps = steps ?? List<String>.from(this.steps)
-      ..status = status ?? this.status;
-    return copy;
+    return Plan._(
+      id: id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      goalId: goalId ?? this.goalId,
+      createdAt: createdAt,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      steps: steps ?? List<String>.from(this.steps),
+      status: status ?? this.status,
+    );
   }
 
   Plan addStep(String step) {
@@ -92,7 +88,6 @@ class Plan {
   }
 
   @override
-  @ignore
   int get hashCode => id.hashCode;
 }
 

@@ -1,40 +1,50 @@
-import 'package:isar/isar.dart';
 import 'package:uuid/uuid.dart';
 
-part 'day_planner.g.dart';
-
 /// Represents a task in a planner
-@embedded
 class Task {
-  late String id;
-  late String title;
-  String? description;
-  DateTime? scheduledTime;
-  int? durationMinutes;
+  final String id;
+  final String title;
+  final String? description;
+  final DateTime? scheduledTime;
+  final int? durationMinutes;
+  final TaskPriority priority;
+  final bool completed;
+  final String? planId;
+  final int? pomodoroBlock; // 1–4, null = unassigned
 
-  @enumerated
-  late TaskPriority priority;
-
-  late bool completed;
-  String? planId;
-
-  Task();
+  const Task._({
+    required this.id,
+    required this.title,
+    this.description,
+    this.scheduledTime,
+    this.durationMinutes,
+    required this.priority,
+    required this.completed,
+    this.planId,
+    this.pomodoroBlock,
+  });
 
   Task.create({
     String? id,
     required String title,
-    this.description,
-    this.scheduledTime,
-    this.durationMinutes,
+    String? description,
+    DateTime? scheduledTime,
+    int? durationMinutes,
     TaskPriority priority = TaskPriority.medium,
     bool completed = false,
-    this.planId,
-  }) {
-    this.id = id ?? const Uuid().v4();
-    this.title = title;
-    this.priority = priority;
-    this.completed = completed;
-  }
+    String? planId,
+    int? pomodoroBlock,
+  }) : this._(
+          id: id ?? const Uuid().v4(),
+          title: title,
+          description: description,
+          scheduledTime: scheduledTime,
+          durationMinutes: durationMinutes,
+          priority: priority,
+          completed: completed,
+          planId: planId,
+          pomodoroBlock: pomodoroBlock,
+        );
 
   Task copyWith({
     String? title,
@@ -44,17 +54,20 @@ class Task {
     TaskPriority? priority,
     bool? completed,
     String? planId,
+    int? pomodoroBlock,
+    bool clearPomodoroBlock = false,
   }) {
-    final copy = Task()
-      ..id = id
-      ..title = title ?? this.title
-      ..description = description ?? this.description
-      ..scheduledTime = scheduledTime ?? this.scheduledTime
-      ..durationMinutes = durationMinutes ?? this.durationMinutes
-      ..priority = priority ?? this.priority
-      ..completed = completed ?? this.completed
-      ..planId = planId ?? this.planId;
-    return copy;
+    return Task._(
+      id: id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      scheduledTime: scheduledTime ?? this.scheduledTime,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
+      priority: priority ?? this.priority,
+      completed: completed ?? this.completed,
+      planId: planId ?? this.planId,
+      pomodoroBlock: clearPomodoroBlock ? null : (pomodoroBlock ?? this.pomodoroBlock),
+    );
   }
 
   Task toggleCompleted() {
@@ -85,44 +98,42 @@ enum TaskPriority {
 }
 
 /// Represents a daily planner
-@collection
 class DayPlanner {
-  Id isarId = Isar.autoIncrement;
+  final String id;
+  final DateTime date;
+  final List<Task> tasks;
+  final String? notes;
 
-  @Index(unique: true)
-  late String id;
-
-  @Index()
-  late DateTime date;
-
-  late List<Task> tasks;
-  String? notes;
-
-  DayPlanner();
+  const DayPlanner._({
+    required this.id,
+    required this.date,
+    required this.tasks,
+    this.notes,
+  });
 
   DayPlanner.create({
     String? id,
     required DateTime date,
     List<Task>? tasks,
-    this.notes,
-  }) {
-    this.id = id ?? const Uuid().v4();
-    this.date = DateTime(date.year, date.month, date.day);
-    this.tasks = tasks ?? [];
-  }
+    String? notes,
+  }) : this._(
+          id: id ?? const Uuid().v4(),
+          date: DateTime(date.year, date.month, date.day),
+          tasks: tasks ?? const [],
+          notes: notes,
+        );
 
   DayPlanner copyWith({
     DateTime? date,
     List<Task>? tasks,
     String? notes,
   }) {
-    final copy = DayPlanner()
-      ..isarId = isarId
-      ..id = id
-      ..date = date ?? this.date
-      ..tasks = tasks ?? List<Task>.from(this.tasks)
-      ..notes = notes ?? this.notes;
-    return copy;
+    return DayPlanner._(
+      id: id,
+      date: date ?? this.date,
+      tasks: tasks ?? List<Task>.from(this.tasks),
+      notes: notes ?? this.notes,
+    );
   }
 
   DayPlanner addTask(Task task) {
@@ -139,13 +150,10 @@ class DayPlanner {
     );
   }
 
-  @ignore
   List<Task> get completedTasks => tasks.where((t) => t.completed).toList();
 
-  @ignore
   List<Task> get pendingTasks => tasks.where((t) => !t.completed).toList();
 
-  @ignore
   double get completionRate {
     if (tasks.isEmpty) return 0.0;
     return completedTasks.length / tasks.length;
@@ -163,6 +171,5 @@ class DayPlanner {
   }
 
   @override
-  @ignore
   int get hashCode => id.hashCode;
 }
