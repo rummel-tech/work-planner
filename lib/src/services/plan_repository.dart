@@ -1,4 +1,5 @@
 import 'package:isar/isar.dart';
+import 'package:flutter/foundation.dart';
 
 import '../models/plan.dart';
 import 'database_service.dart';
@@ -21,7 +22,7 @@ class PlanRepository {
         final plans = remote.map(_fromJson).toList();
         await _syncToIsar(plans);
         return plans;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
     }
     return _isar.plans.where().findAll();
   }
@@ -33,7 +34,7 @@ class PlanRepository {
         final plans = remote.map(_fromJson).toList();
         await _syncToIsar(plans);
         return plans;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
     }
     return _isar.plans.filter().goalIdEqualTo(goalId).findAll();
   }
@@ -45,7 +46,7 @@ class PlanRepository {
         final plans = remote.map(_fromJson).toList();
         await _syncToIsar(plans);
         return plans;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
     }
     return _isar.plans.filter().statusEqualTo(status).findAll();
   }
@@ -84,7 +85,7 @@ class PlanRepository {
         final synced = _fromJson(remote);
         await _writeToIsar(synced);
         return synced;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
     }
     await _writeToIsar(plan);
     return plan;
@@ -94,7 +95,7 @@ class PlanRepository {
     final api = _api; if (api != null) {
       try {
         await api.deletePlan(id);
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
     }
     await _isar.writeTxn(() => _isar.plans.filter().idEqualTo(id).deleteFirst());
   }
@@ -105,7 +106,7 @@ class PlanRepository {
       for (final p in plans) {
         try {
           await api.deletePlan(p.id);
-        } catch (_) {}
+        } catch (e) { debugPrint('[PlanRepository] API error (falling back to cache): $e'); }
       }
     }
     await _isar.writeTxn(() => _isar.plans.filter().goalIdEqualTo(goalId).deleteAll());

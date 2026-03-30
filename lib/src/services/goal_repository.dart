@@ -1,4 +1,5 @@
 import 'package:isar/isar.dart';
+import 'package:flutter/foundation.dart';
 
 import '../models/goal.dart';
 import 'database_service.dart';
@@ -36,7 +37,7 @@ class GoalRepository {
         final goals = remote.map(_fromJson).toList();
         await _syncToIsar(goals);
         return goals;
-      } catch (_) {}
+      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
     }
     return _isar.goals.filter().typeEqualTo(type).findAll();
   }
@@ -48,7 +49,7 @@ class GoalRepository {
         final goals = remote.map(_fromJson).toList();
         await _syncToIsar(goals);
         return goals;
-      } catch (_) {}
+      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
     }
     return _isar.goals.filter().statusEqualTo(status).findAll();
   }
@@ -61,7 +62,7 @@ class GoalRepository {
         final goals = [...inProgress, ...notStarted].map(_fromJson).toList();
         await _syncToIsar(goals);
         return goals;
-      } catch (_) {}
+      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
     }
     return _isar.goals
         .filter()
@@ -111,7 +112,7 @@ class GoalRepository {
     final api = _api; if (api != null) {
       try {
         await api.deleteGoal(id);
-      } catch (_) {}
+      } catch (e) { debugPrint('[GoalRepository] API error (falling back to cache): $e'); }
     }
     await _isar.writeTxn(() => _isar.goals.filter().idEqualTo(id).deleteFirst());
   }

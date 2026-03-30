@@ -21,7 +21,11 @@
       "Bash(cd /home/shawn/_Projects/modules/planners/work-planner/lib/src/screens __NEW_LINE_063d93c0e24fb56b__ find . -name \"*.dart\")",
       "Bash(xargs perl -i -pe 's/= GoalRepository\\\\\\(\\\\\\)/= ServiceLocator.goals/g;:*)",
       "Bash(perl -i -ne \"print unless /import ''..\\\\/..\\\\/models\\\\/goal\\\\.dart'';/ and $ARGV eq ''lib/src/screens/plans/plans_screen.dart''\" lib/src/screens/plans/plans_screen.dart)",
-      "Bash(perl -i -ne \"print unless /import ''api_config\\\\.dart'';/\" lib/src/services/api_service.dart)"
+      "Bash(perl -i -ne \"print unless /import ''api_config\\\\.dart'';/\" lib/src/services/api_service.dart)",
+      "Bash(grep -E \"\\\\.py$\")",
+      "Bash(find:*)",
+      "Bash(grep -r alembic /home/shawn/_Projects/services/work-planner --include=*.py)",
+      "Bash(grep -E \"\\\\.env|Makefile|Procfile|\\\\.sh$\")"
     ]
   }
 }

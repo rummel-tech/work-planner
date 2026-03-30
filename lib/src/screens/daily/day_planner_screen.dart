@@ -44,24 +44,21 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
     if (_planner == null) return;
 
     final updatedTask = task.toggleCompleted();
-    final updatedPlanner = _planner!.updateTask(updatedTask);
-    await _plannerRepository.saveDayPlanner(updatedPlanner);
+    await _plannerRepository.updateTask(widget.date, updatedTask);
     _loadPlanner();
   }
 
   Future<void> _deleteTask(Task task) async {
     if (_planner == null) return;
 
-    final updatedPlanner = _planner!.removeTask(task.id);
-    await _plannerRepository.saveDayPlanner(updatedPlanner);
+    await _plannerRepository.removeTask(widget.date, task.id);
     _loadPlanner();
   }
 
   Future<void> _saveNotes() async {
     if (_planner == null) return;
 
-    final updatedPlanner = _planner!.copyWith(notes: _notesController.text);
-    await _plannerRepository.saveDayPlanner(updatedPlanner);
+    await _plannerRepository.updateDayPlannerNotes(widget.date, _notesController.text);
   }
 
   String _formatDate() {

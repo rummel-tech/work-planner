@@ -1,4 +1,5 @@
 import 'package:isar/isar.dart';
+import 'package:flutter/foundation.dart';
 
 import '../planners/day_planner.dart';
 import '../planners/week_planner.dart';
@@ -32,7 +33,7 @@ class PlannerRepository {
         final dp = _dayPlannerFromJson(remote);
         await _isar.writeTxn(() => _isar.dayPlanners.put(dp));
         return dp;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
     }
     return _isar.dayPlanners.filter().dateEqualTo(normalized).findFirst();
   }
@@ -57,7 +58,7 @@ class PlannerRepository {
         final dp = _dayPlannerFromJson(remote);
         await _isar.writeTxn(() => _isar.dayPlanners.put(dp));
         return dp;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
     }
 
     var planner = await _isar.dayPlanners.filter().dateEqualTo(normalized).findFirst();
@@ -70,6 +71,25 @@ class PlannerRepository {
 
   Future<void> saveDayPlanner(DayPlanner planner) async {
     await _isar.writeTxn(() => _isar.dayPlanners.put(planner));
+  }
+
+  Future<DayPlanner> updateDayPlannerNotes(DateTime date, String notes) async {
+    final normalized = DateTime(date.year, date.month, date.day);
+    final dateStr = '${normalized.year}-${normalized.month.toString().padLeft(2, '0')}-${normalized.day.toString().padLeft(2, '0')}';
+
+    final api = _api; if (api != null) {
+      try {
+        final remote = await api.updateDayPlanner(dateStr, notes: notes);
+        final dp = _dayPlannerFromJson(remote);
+        await _isar.writeTxn(() => _isar.dayPlanners.put(dp));
+        return dp;
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
+    }
+
+    final planner = await getOrCreateDayPlanner(normalized);
+    final updated = planner.copyWith(notes: notes);
+    await _isar.writeTxn(() => _isar.dayPlanners.put(updated));
+    return updated;
   }
 
   Future<void> deleteDayPlanner(String id) async {
@@ -108,7 +128,7 @@ class PlannerRepository {
         final dp = _dayPlannerFromJson(remote);
         await _isar.writeTxn(() => _isar.dayPlanners.put(dp));
         return dp;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
     }
 
     final planner = await getOrCreateDayPlanner(normalized);
@@ -128,7 +148,7 @@ class PlannerRepository {
           if (updatedTask.scheduledTime != null) 'scheduled_time': updatedTask.scheduledTime!.toIso8601String(),
           if (updatedTask.durationMinutes != null) 'duration_minutes': updatedTask.durationMinutes,
         });
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
     }
 
     final planner = await getOrCreateDayPlanner(date);
@@ -141,7 +161,7 @@ class PlannerRepository {
     final api = _api; if (api != null) {
       try {
         await api.deleteTask(taskId);
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
     }
 
     final planner = await getOrCreateDayPlanner(date);
@@ -185,7 +205,7 @@ class PlannerRepository {
         final wp = _weekPlannerFromJson(remote, normalized);
         await _isar.writeTxn(() => _isar.weekPlanners.put(wp));
         return wp;
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
     }
 
     var planner = await _isar.weekPlanners.filter().weekStartDateEqualTo(normalized).findFirst();
@@ -234,7 +254,7 @@ class PlannerRepository {
           completedTasks: stats['completed_tasks'] as int? ?? 0,
           completionRate: (stats['completion_rate'] as num?)?.toDouble() ?? 0.0,
         );
-      } catch (_) {}
+      } catch (e) { debugPrint('[PlannerRepository] API error (falling back to cache): $e'); }
     }
 
     final dayPlanners = await getDayPlannersForWeek(weekPlanner);

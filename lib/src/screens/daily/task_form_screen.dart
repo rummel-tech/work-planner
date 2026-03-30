@@ -88,8 +88,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       );
     }
 
-    final planner = await _plannerRepository.getOrCreateDayPlanner(widget.date);
-
     if (_isEditing) {
       final updatedTask = widget.task!.copyWith(
         title: _titleController.text.trim(),
@@ -101,8 +99,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         durationMinutes: _durationMinutes,
         planId: _planId,
       );
-      final updatedPlanner = planner.updateTask(updatedTask);
-      await _plannerRepository.saveDayPlanner(updatedPlanner);
+      await _plannerRepository.updateTask(widget.date, updatedTask);
     } else {
       final newTask = Task.create(
         title: _titleController.text.trim(),
@@ -114,8 +111,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         durationMinutes: _durationMinutes,
         planId: _planId,
       );
-      final updatedPlanner = planner.addTask(newTask);
-      await _plannerRepository.saveDayPlanner(updatedPlanner);
+      await _plannerRepository.addTask(widget.date, newTask);
     }
 
     if (mounted) {

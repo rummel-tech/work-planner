@@ -60,8 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_todayPlanner == null) return;
 
     final updatedTask = task.toggleCompleted();
-    final updatedPlanner = _todayPlanner!.updateTask(updatedTask);
-    await _plannerRepository.saveDayPlanner(updatedPlanner);
+    await _plannerRepository.updateTask(DateTime.now(), updatedTask);
     _loadData();
   }
 
@@ -674,16 +673,14 @@ class _TodayScreenState extends State<_TodayScreen> {
     if (_todayPlanner == null) return;
 
     final updatedTask = task.toggleCompleted();
-    final updatedPlanner = _todayPlanner!.updateTask(updatedTask);
-    await _plannerRepository.saveDayPlanner(updatedPlanner);
+    await _plannerRepository.updateTask(DateTime.now(), updatedTask);
     _loadTodayPlanner();
   }
 
   Future<void> _deleteTask(Task task) async {
     if (_todayPlanner == null) return;
 
-    final updatedPlanner = _todayPlanner!.removeTask(task.id);
-    await _plannerRepository.saveDayPlanner(updatedPlanner);
+    await _plannerRepository.removeTask(DateTime.now(), task.id);
     _loadTodayPlanner();
   }
 

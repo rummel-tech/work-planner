@@ -78,6 +78,10 @@ class ApiService {
     return await _post('/day-planners', {'date': date, if (notes != null) 'notes': notes}) as Map<String, dynamic>;
   }
 
+  Future<Map<String, dynamic>> updateDayPlanner(String date, {String? notes}) async {
+    return await _patch('/day-planners/$date', {if (notes != null) 'notes': notes}) as Map<String, dynamic>;
+  }
+
   Future<Map<String, dynamic>> createTask(String date, Map<String, dynamic> body) async {
     return await _post('/day-planners/$date/tasks', body) as Map<String, dynamic>;
   }
