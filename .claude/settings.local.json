@@ -38,7 +38,9 @@
       "Bash(python3 -m json.tool)",
       "Bash(source .venv/bin/activate)",
       "Bash(BOOTSTRAP_EMAIL=dev@test.com BOOTSTRAP_PASSWORD=devpass123 python scripts/bootstrap.py --codes 0)",
-      "Bash(jobs -l)"
+      "Bash(jobs -l)",
+      "Bash(echo \"Exit: $?\")",
+      "Read(//tmp/**)"
     ]
   }
 }
