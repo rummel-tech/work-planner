@@ -1,9 +1,8 @@
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../planners/day_planner.dart';
 import '../../models/plan.dart';
-import '../../services/planner_repository.dart';
-import '../../services/plan_repository.dart';
 
 class TaskFormScreen extends StatefulWidget {
   final Task? task;
@@ -17,8 +16,8 @@ class TaskFormScreen extends StatefulWidget {
 
 class _TaskFormScreenState extends State<TaskFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _plannerRepository = PlannerRepository();
-  final _planRepository = PlanRepository();
+  final _plannerRepository = ServiceLocator.planners;
+  final _planRepository = ServiceLocator.plans;
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 

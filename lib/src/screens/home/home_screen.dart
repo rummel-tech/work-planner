@@ -1,11 +1,10 @@
+import '../../models/plan.dart';
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/goal.dart';
 import '../../planners/day_planner.dart';
 import '../../planners/week_planner.dart';
-import '../../services/goal_repository.dart';
-import '../../services/plan_repository.dart';
-import '../../services/planner_repository.dart';
 import '../../ui_components/completion_indicator.dart';
 import '../../ui_components/goal_card.dart';
 import '../../ui_components/task_tile.dart';
@@ -19,9 +18,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _goalRepository = GoalRepository();
-  final _planRepository = PlanRepository();
-  final _plannerRepository = PlannerRepository();
+  final _goalRepository = ServiceLocator.goals;
+  final _planRepository = ServiceLocator.plans;
+  final _plannerRepository = ServiceLocator.planners;
 
   int _currentIndex = 0;
   List<Goal> _activeGoals = [];
@@ -338,8 +337,8 @@ class _GoalsScreen extends StatefulWidget {
 
 class _GoalsScreenState extends State<_GoalsScreen>
     with SingleTickerProviderStateMixin {
-  final _goalRepository = GoalRepository();
-  final _planRepository = PlanRepository();
+  final _goalRepository = ServiceLocator.goals;
+  final _planRepository = ServiceLocator.plans;
   late TabController _tabController;
   List<Goal> _allGoals = [];
   Map<String, int> _planCounts = {};
@@ -480,7 +479,7 @@ class _WeeklyScreen extends StatefulWidget {
 }
 
 class _WeeklyScreenState extends State<_WeeklyScreen> {
-  final _plannerRepository = PlannerRepository();
+  final _plannerRepository = ServiceLocator.planners;
   WeekPlanner? _weekPlanner;
   Map<int, DayPlanner> _dayPlanners = {};
   DateTime _currentWeekStart = DateTime.now();
@@ -654,7 +653,7 @@ class _TodayScreen extends StatefulWidget {
 }
 
 class _TodayScreenState extends State<_TodayScreen> {
-  final _plannerRepository = PlannerRepository();
+  final _plannerRepository = ServiceLocator.planners;
   DayPlanner? _todayPlanner;
 
   @override

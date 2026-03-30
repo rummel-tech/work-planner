@@ -1,7 +1,7 @@
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../planners/day_planner.dart';
-import '../../services/planner_repository.dart';
 import '../../ui_components/task_tile.dart';
 import '../../ui_components/completion_indicator.dart';
 import '../../navigation/app_router.dart';
@@ -16,7 +16,7 @@ class DayPlannerScreen extends StatefulWidget {
 }
 
 class _DayPlannerScreenState extends State<DayPlannerScreen> {
-  final _plannerRepository = PlannerRepository();
+  final _plannerRepository = ServiceLocator.planners;
   DayPlanner? _planner;
   final _notesController = TextEditingController();
 

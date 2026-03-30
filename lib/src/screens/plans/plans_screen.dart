@@ -1,7 +1,7 @@
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/plan.dart';
-import '../../services/plan_repository.dart';
 import '../../ui_components/plan_card.dart';
 import '../../ui_components/empty_state.dart';
 import '../../navigation/app_router.dart';
@@ -16,7 +16,7 @@ class PlansScreen extends StatefulWidget {
 }
 
 class _PlansScreenState extends State<PlansScreen> {
-  final _planRepository = PlanRepository();
+  final _planRepository = ServiceLocator.plans;
   List<Plan> _plans = [];
   bool _isLoading = true;
 

@@ -1,7 +1,7 @@
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/plan.dart';
-import '../../services/plan_repository.dart';
 import '../../ui_components/status_chip.dart';
 import '../../navigation/app_router.dart';
 
@@ -15,7 +15,7 @@ class PlanDetailScreen extends StatefulWidget {
 }
 
 class _PlanDetailScreenState extends State<PlanDetailScreen> {
-  final _planRepository = PlanRepository();
+  final _planRepository = ServiceLocator.plans;
   late Plan _plan;
   final _stepController = TextEditingController();
 

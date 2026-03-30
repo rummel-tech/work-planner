@@ -15,13 +15,22 @@ export 'src/planners/day_planner.dart';
 export 'src/planners/week_planner.dart';
 
 // Services
+export 'src/services/api_config.dart';
+export 'src/services/api_service.dart';
+export 'src/services/auth_service.dart';
 export 'src/services/database_service.dart';
 export 'src/services/goal_repository.dart';
 export 'src/services/plan_repository.dart';
 export 'src/services/planner_repository.dart';
+export 'src/services/service_locator.dart';
 
 // Navigation
 export 'src/navigation/app_router.dart';
+
+// Auth screens
+export 'src/screens/auth/welcome_screen.dart';
+export 'src/screens/auth/login_screen.dart';
+export 'src/screens/auth/register_screen.dart';
 
 // Screens
 export 'src/screens/home/home_screen.dart';

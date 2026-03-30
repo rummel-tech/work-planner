@@ -1,7 +1,7 @@
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/goal.dart';
-import '../../services/goal_repository.dart';
 
 class GoalFormScreen extends StatefulWidget {
   final Goal? goal;
@@ -14,7 +14,7 @@ class GoalFormScreen extends StatefulWidget {
 
 class _GoalFormScreenState extends State<GoalFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _goalRepository = GoalRepository();
+  final _goalRepository = ServiceLocator.goals;
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 

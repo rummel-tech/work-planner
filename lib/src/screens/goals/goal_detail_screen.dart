@@ -1,9 +1,8 @@
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/goal.dart';
 import '../../models/plan.dart';
-import '../../services/goal_repository.dart';
-import '../../services/plan_repository.dart';
 import '../../ui_components/plan_card.dart';
 import '../../ui_components/status_chip.dart';
 import '../../navigation/app_router.dart';
@@ -18,8 +17,8 @@ class GoalDetailScreen extends StatefulWidget {
 }
 
 class _GoalDetailScreenState extends State<GoalDetailScreen> {
-  final _goalRepository = GoalRepository();
-  final _planRepository = PlanRepository();
+  final _goalRepository = ServiceLocator.goals;
+  final _planRepository = ServiceLocator.plans;
   late Goal _goal;
   List<Plan> _plans = [];
 

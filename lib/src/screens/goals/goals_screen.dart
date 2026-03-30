@@ -1,8 +1,8 @@
+import '../../models/plan.dart';
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/goal.dart';
-import '../../services/goal_repository.dart';
-import '../../services/plan_repository.dart';
 import '../../ui_components/goal_card.dart';
 import '../../ui_components/empty_state.dart';
 import '../../navigation/app_router.dart';
@@ -16,8 +16,8 @@ class GoalsScreen extends StatefulWidget {
 
 class _GoalsScreenState extends State<GoalsScreen>
     with SingleTickerProviderStateMixin {
-  final _goalRepository = GoalRepository();
-  final _planRepository = PlanRepository();
+  final _goalRepository = ServiceLocator.goals;
+  final _planRepository = ServiceLocator.plans;
   late TabController _tabController;
   List<Goal> _allGoals = [];
   Map<String, int> _planCounts = {};

@@ -1,8 +1,8 @@
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../planners/day_planner.dart';
 import '../../planners/week_planner.dart';
-import '../../services/planner_repository.dart';
 import '../../ui_components/completion_indicator.dart';
 import '../../navigation/app_router.dart';
 
@@ -16,7 +16,7 @@ class WeeklyPlannerScreen extends StatefulWidget {
 }
 
 class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
-  final _plannerRepository = PlannerRepository();
+  final _plannerRepository = ServiceLocator.planners;
   final _goalController = TextEditingController();
   WeekPlanner? _weekPlanner;
   Map<int, DayPlanner> _dayPlanners = {};

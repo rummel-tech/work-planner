@@ -1,7 +1,8 @@
+import '../../models/goal.dart';
+import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/plan.dart';
-import '../../services/plan_repository.dart';
 
 class PlanFormScreen extends StatefulWidget {
   final Plan? plan;
@@ -15,7 +16,7 @@ class PlanFormScreen extends StatefulWidget {
 
 class _PlanFormScreenState extends State<PlanFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _planRepository = PlanRepository();
+  final _planRepository = ServiceLocator.plans;
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 

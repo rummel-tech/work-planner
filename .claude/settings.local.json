@@ -8,7 +8,20 @@
       "Bash(flutter analyze:*)",
       "Bash(flutter test:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(find /home/shawn/_Projects/modules/planners/work-planner -name AndroidManifest.xml -o -name Info.plist -o -name build.gradle -o -name *.pbxproj)",
+      "Bash(find /home/shawn/_Projects/modules/planners/work-planner -name test* -o -name *_test.dart)",
+      "Bash(wc -l /home/shawn/_Projects/modules/planners/work-planner/lib/src/ui_components/*.dart)",
+      "Bash(git:*)",
+      "Bash(grep -E \"\\\\.\\(dart|py\\)$\")",
+      "Bash(python3 -m venv .venv)",
+      "Bash(.venv/bin/pip install:*)",
+      "Bash(timeout 5 .venv/bin/python -c \"import sys; sys.path.insert\\(0, '..'\\); from main import app; print\\('OK — routes:', [r.path for r in app.routes]\\)\" 2>&1)",
+      "Bash(timeout 5 .venv/bin/python -c \"import sys; sys.path.insert\\(0, '..'\\); from main import app; print\\('OK'\\); print\\([r.path for r in app.routes if hasattr\\(r, 'path'\\)]\\)\" 2>&1)",
+      "Bash(cd /home/shawn/_Projects/modules/planners/work-planner/lib/src/screens __NEW_LINE_063d93c0e24fb56b__ find . -name \"*.dart\")",
+      "Bash(xargs perl -i -pe 's/= GoalRepository\\\\\\(\\\\\\)/= ServiceLocator.goals/g;:*)",
+      "Bash(perl -i -ne \"print unless /import ''..\\\\/..\\\\/models\\\\/goal\\\\.dart'';/ and $ARGV eq ''lib/src/screens/plans/plans_screen.dart''\" lib/src/screens/plans/plans_screen.dart)",
+      "Bash(perl -i -ne \"print unless /import ''api_config\\\\.dart'';/\" lib/src/services/api_service.dart)"
     ]
   }
 }
