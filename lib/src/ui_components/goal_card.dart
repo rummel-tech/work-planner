@@ -19,8 +19,12 @@ class GoalCard extends StatelessWidget {
     switch (goal.type) {
       case GoalType.corporate:
         return Icons.business;
-      case GoalType.entrepreneurial:
-        return Icons.lightbulb_outline;
+      case GoalType.farm:
+        return Icons.agriculture;
+      case GoalType.appDevelopment:
+        return Icons.code;
+      case GoalType.homeAuto:
+        return Icons.home;
     }
   }
 
@@ -28,8 +32,25 @@ class GoalCard extends StatelessWidget {
     switch (goal.type) {
       case GoalType.corporate:
         return 'Corporate';
-      case GoalType.entrepreneurial:
-        return 'Entrepreneurial';
+      case GoalType.farm:
+        return 'Farm';
+      case GoalType.appDevelopment:
+        return 'App Dev';
+      case GoalType.homeAuto:
+        return 'Home & Auto';
+    }
+  }
+
+  Color _typeColor(BuildContext context) {
+    switch (goal.type) {
+      case GoalType.corporate:
+        return Theme.of(context).colorScheme.primary;
+      case GoalType.farm:
+        return Colors.green.shade700;
+      case GoalType.appDevelopment:
+        return Colors.orange.shade700;
+      case GoalType.homeAuto:
+        return Colors.purple.shade600;
     }
   }
 
@@ -41,6 +62,7 @@ class GoalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final color = _typeColor(context);
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -53,13 +75,11 @@ class GoalCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(_typeIcon, size: 20, color: theme.colorScheme.primary),
+                  Icon(_typeIcon, size: 20, color: color),
                   const SizedBox(width: 8),
                   Text(
                     _typeLabel,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                    ),
+                    style: theme.textTheme.labelMedium?.copyWith(color: color),
                   ),
                   const Spacer(),
                   GoalStatusChip(status: goal.status),

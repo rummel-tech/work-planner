@@ -18,7 +18,8 @@ class GoalRepository {
   // ---------------------------------------------------------------------------
 
   Future<List<Goal>> getAll() async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final remote = await api.getGoals();
         ConnectivityNotifier.setOffline(false);
@@ -35,7 +36,8 @@ class GoalRepository {
   }
 
   Future<List<Goal>> getByType(GoalType type) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final remote = await api.getGoals(goalType: type.name);
         ConnectivityNotifier.setOffline(false);
@@ -47,13 +49,16 @@ class GoalRepository {
         debugPrint('[GoalRepository] API error (falling back to cache): $e');
       }
     }
-    final records = await _store.find(_db,
-        finder: Finder(filter: Filter.equals('type', type.name)));
+    final records = await _store.find(
+      _db,
+      finder: Finder(filter: Filter.equals('type', type.name)),
+    );
     return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Goal>> getByStatus(GoalStatus status) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final remote = await api.getGoals(status: status.name);
         ConnectivityNotifier.setOffline(false);
@@ -65,16 +70,23 @@ class GoalRepository {
         debugPrint('[GoalRepository] API error (falling back to cache): $e');
       }
     }
-    final records = await _store.find(_db,
-        finder: Finder(filter: Filter.equals('status', status.name)));
+    final records = await _store.find(
+      _db,
+      finder: Finder(filter: Filter.equals('status', status.name)),
+    );
     return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Goal>> getActive() async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
-        final inProgress = await api.getGoals(status: GoalStatus.inProgress.name);
-        final notStarted = await api.getGoals(status: GoalStatus.notStarted.name);
+        final inProgress = await api.getGoals(
+          status: GoalStatus.inProgress.name,
+        );
+        final notStarted = await api.getGoals(
+          status: GoalStatus.notStarted.name,
+        );
         ConnectivityNotifier.setOffline(false);
         final goals = [...inProgress, ...notStarted].map(_fromApiJson).toList();
         await _syncToDb(goals);
@@ -84,13 +96,15 @@ class GoalRepository {
         debugPrint('[GoalRepository] API error (falling back to cache): $e');
       }
     }
-    final records = await _store.find(_db,
-        finder: Finder(
-          filter: Filter.or([
-            Filter.equals('status', GoalStatus.inProgress.name),
-            Filter.equals('status', GoalStatus.notStarted.name),
-          ]),
-        ));
+    final records = await _store.find(
+      _db,
+      finder: Finder(
+        filter: Filter.or([
+          Filter.equals('status', GoalStatus.inProgress.name),
+          Filter.equals('status', GoalStatus.notStarted.name),
+        ]),
+      ),
+    );
     return records.map((r) => _fromLocal(r.value)).toList();
   }
 
@@ -105,7 +119,8 @@ class GoalRepository {
   // ---------------------------------------------------------------------------
 
   Future<Goal> save(Goal goal) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final isNew = await getById(goal.id) == null;
         final Map<String, dynamic> body = {
@@ -113,7 +128,8 @@ class GoalRepository {
           'description': goal.description,
           'goal_type': goal.type.name,
           'status': goal.status.name,
-          if (goal.targetDate != null) 'target_date': goal.targetDate!.toIso8601String().split('T').first,
+          if (goal.targetDate != null)
+            'target_date': goal.targetDate!.toIso8601String().split('T').first,
         };
         final Map<String, dynamic> remote;
         if (isNew) {
@@ -135,10 +151,13 @@ class GoalRepository {
   }
 
   Future<void> delete(String id) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         await api.deleteGoal(id);
-      } catch (e) { debugPrint('[GoalRepository] API error: $e'); }
+      } catch (e) {
+        debugPrint('[GoalRepository] API error: $e');
+      }
     }
     await _store.record(id).delete(_db);
   }
@@ -167,15 +186,14 @@ class GoalRepository {
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
       createdAt: DateTime.parse(json['createdAt'] as String),
-      targetDate: json['targetDate'] != null ? DateTime.tryParse(json['targetDate'] as String) : null,
+      targetDate: json['targetDate'] != null
+          ? DateTime.tryParse(json['targetDate'] as String)
+          : null,
       status: GoalStatus.values.firstWhere(
         (s) => s.name == json['status'],
         orElse: () => GoalStatus.notStarted,
       ),
-      type: GoalType.values.firstWhere(
-        (t) => t.name == json['type'],
-        orElse: () => GoalType.corporate,
-      ),
+      type: _parseGoalType(json['type'] as String?),
     );
   }
 
@@ -185,16 +203,33 @@ class GoalRepository {
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
       createdAt: DateTime.parse(json['created_at'] as String),
-      targetDate: json['target_date'] != null ? DateTime.tryParse(json['target_date'] as String) : null,
+      targetDate: json['target_date'] != null
+          ? DateTime.tryParse(json['target_date'] as String)
+          : null,
       status: GoalStatus.values.firstWhere(
         (s) => s.name == json['status'],
         orElse: () => GoalStatus.notStarted,
       ),
-      type: GoalType.values.firstWhere(
-        (t) => t.name == json['goal_type'],
-        orElse: () => GoalType.corporate,
-      ),
+      type: _parseGoalType(json['goal_type'] as String?),
     );
+  }
+
+  /// Parses goal type with backward-compat for legacy 'entrepreneurial' value.
+  GoalType _parseGoalType(String? value) {
+    switch (value) {
+      case 'corporate':
+        return GoalType.corporate;
+      case 'farm':
+        return GoalType.farm;
+      case 'appDevelopment':
+        return GoalType.appDevelopment;
+      case 'homeAuto':
+        return GoalType.homeAuto;
+      case 'entrepreneurial': // legacy — migrate to farm
+        return GoalType.farm;
+      default:
+        return GoalType.corporate;
+    }
   }
 
   Future<void> _syncToDb(List<Goal> goals) async {

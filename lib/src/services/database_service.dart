@@ -29,8 +29,9 @@ class DatabaseService {
       await _instance._db.close();
       _instance._initialized = false;
     }
-    _instance._db = await databaseFactoryMemory
-        .openDatabase('test_${DateTime.now().millisecondsSinceEpoch}.db');
+    _instance._db = await databaseFactoryMemory.openDatabase(
+      'test_${DateTime.now().millisecondsSinceEpoch}.db',
+    );
     _instance._initialized = true;
   }
 

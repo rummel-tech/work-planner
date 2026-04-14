@@ -26,7 +26,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('No plans yet'), findsOneWidget);
       expect(
-          find.text('Create a plan to work towards your goal'), findsOneWidget);
+        find.text('Create a plan to work towards your goal'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('always shows a FAB', (tester) async {
@@ -81,8 +83,9 @@ void main() {
       expect(find.text('Other Goal Plan'), findsNothing);
     });
 
-    testWidgets('empty state contains a "Create Plan" action button',
-        (tester) async {
+    testWidgets('empty state contains a "Create Plan" action button', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
       expect(find.text('Create Plan'), findsOneWidget);

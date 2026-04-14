@@ -25,7 +25,7 @@ class _GoalsScreenState extends State<GoalsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _loadGoals();
   }
 
@@ -56,9 +56,13 @@ class _GoalsScreenState extends State<GoalsScreen>
       case 1:
         return _allGoals.where((g) => g.type == GoalType.corporate).toList();
       case 2:
+        return _allGoals.where((g) => g.type == GoalType.farm).toList();
+      case 3:
         return _allGoals
-            .where((g) => g.type == GoalType.entrepreneurial)
+            .where((g) => g.type == GoalType.appDevelopment)
             .toList();
+      case 4:
+        return _allGoals.where((g) => g.type == GoalType.homeAuto).toList();
       default:
         return _allGoals;
     }
@@ -71,10 +75,14 @@ class _GoalsScreenState extends State<GoalsScreen>
         title: const Text('Goals'),
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           tabs: const [
             Tab(text: 'All'),
-            Tab(text: 'Corporate'),
-            Tab(text: 'Entrepreneurial'),
+            Tab(text: 'Corp'),
+            Tab(text: 'Farm'),
+            Tab(text: 'App Dev'),
+            Tab(text: 'Home & Auto'),
           ],
         ),
       ),
@@ -86,6 +94,8 @@ class _GoalsScreenState extends State<GoalsScreen>
                 _buildGoalList(0),
                 _buildGoalList(1),
                 _buildGoalList(2),
+                _buildGoalList(3),
+                _buildGoalList(4),
               ],
             ),
       floatingActionButton: FloatingActionButton(

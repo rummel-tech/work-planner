@@ -71,6 +71,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
         type: _type,
         status: _status,
         targetDate: _targetDate,
+        clearTargetDate: _targetDate == null,
       );
     } else {
       goal = Goal.create(
@@ -92,14 +93,38 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
     return '${date.month}/${date.day}/${date.year}';
   }
 
+  String _typeLabel(GoalType type) {
+    switch (type) {
+      case GoalType.corporate:
+        return 'Corporate';
+      case GoalType.farm:
+        return 'Farm';
+      case GoalType.appDevelopment:
+        return 'App Dev';
+      case GoalType.homeAuto:
+        return 'Home & Auto';
+    }
+  }
+
+  IconData _typeIcon(GoalType type) {
+    switch (type) {
+      case GoalType.corporate:
+        return Icons.business;
+      case GoalType.farm:
+        return Icons.agriculture;
+      case GoalType.appDevelopment:
+        return Icons.code;
+      case GoalType.homeAuto:
+        return Icons.home;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Goal' : 'New Goal'),
-      ),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Goal' : 'New Goal')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -138,36 +163,29 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              Text(
-                'Type',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text('Type', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
-              SegmentedButton<GoalType>(
-                segments: const [
-                  ButtonSegment(
-                    value: GoalType.corporate,
-                    label: Text('Corporate'),
-                    icon: Icon(Icons.business),
-                  ),
-                  ButtonSegment(
-                    value: GoalType.entrepreneurial,
-                    label: Text('Entrepreneurial'),
-                    icon: Icon(Icons.lightbulb_outline),
-                  ),
-                ],
-                selected: {_type},
-                onSelectionChanged: (selection) {
-                  setState(() {
-                    _type = selection.first;
-                  });
+              DropdownButtonFormField<GoalType>(
+                value: _type,
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                items: GoalType.values.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Row(
+                      children: [
+                        Icon(_typeIcon(type), size: 18),
+                        const SizedBox(width: 8),
+                        Text(_typeLabel(type)),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) setState(() => _type = value);
                 },
               ),
               const SizedBox(height: 24),
-              Text(
-                'Status',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text('Status', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -184,10 +202,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Target Date',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text('Target Date', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               ListTile(
                 contentPadding: EdgeInsets.zero,

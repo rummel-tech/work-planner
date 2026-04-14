@@ -18,7 +18,8 @@ class PlanRepository {
   // ---------------------------------------------------------------------------
 
   Future<List<Plan>> getAll() async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final remote = await api.getPlans();
         ConnectivityNotifier.setOffline(false);
@@ -35,7 +36,8 @@ class PlanRepository {
   }
 
   Future<List<Plan>> getByGoalId(String goalId) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final remote = await api.getPlans(goalId: goalId);
         ConnectivityNotifier.setOffline(false);
@@ -47,13 +49,16 @@ class PlanRepository {
         debugPrint('[PlanRepository] API error (falling back to cache): $e');
       }
     }
-    final records = await _store.find(_db,
-        finder: Finder(filter: Filter.equals('goalId', goalId)));
+    final records = await _store.find(
+      _db,
+      finder: Finder(filter: Filter.equals('goalId', goalId)),
+    );
     return records.map((r) => _fromLocal(r.value)).toList();
   }
 
   Future<List<Plan>> getByStatus(PlanStatus status) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final remote = await api.getPlans(status: status.name);
         ConnectivityNotifier.setOffline(false);
@@ -65,8 +70,10 @@ class PlanRepository {
         debugPrint('[PlanRepository] API error (falling back to cache): $e');
       }
     }
-    final records = await _store.find(_db,
-        finder: Finder(filter: Filter.equals('status', status.name)));
+    final records = await _store.find(
+      _db,
+      finder: Finder(filter: Filter.equals('status', status.name)),
+    );
     return records.map((r) => _fromLocal(r.value)).toList();
   }
 
@@ -87,7 +94,8 @@ class PlanRepository {
   // ---------------------------------------------------------------------------
 
   Future<Plan> save(Plan plan) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         final isNew = await getById(plan.id) == null;
         final body = {
@@ -95,8 +103,10 @@ class PlanRepository {
           'title': plan.title,
           'description': plan.description,
           'status': plan.status.name,
-          if (plan.startDate != null) 'start_date': plan.startDate!.toIso8601String().split('T').first,
-          if (plan.endDate != null) 'end_date': plan.endDate!.toIso8601String().split('T').first,
+          if (plan.startDate != null)
+            'start_date': plan.startDate!.toIso8601String().split('T').first,
+          if (plan.endDate != null)
+            'end_date': plan.endDate!.toIso8601String().split('T').first,
           'steps': plan.steps,
         };
         final Map<String, dynamic> remote;
@@ -119,25 +129,33 @@ class PlanRepository {
   }
 
   Future<void> delete(String id) async {
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       try {
         await api.deletePlan(id);
-      } catch (e) { debugPrint('[PlanRepository] API error: $e'); }
+      } catch (e) {
+        debugPrint('[PlanRepository] API error: $e');
+      }
     }
     await _store.record(id).delete(_db);
   }
 
   Future<void> deleteByGoalId(String goalId) async {
     final plans = await getByGoalId(goalId);
-    final api = _api; if (api != null) {
+    final api = _api;
+    if (api != null) {
       for (final p in plans) {
         try {
           await api.deletePlan(p.id);
-        } catch (e) { debugPrint('[PlanRepository] API error: $e'); }
+        } catch (e) {
+          debugPrint('[PlanRepository] API error: $e');
+        }
       }
     }
-    await _store.delete(_db,
-        finder: Finder(filter: Filter.equals('goalId', goalId)));
+    await _store.delete(
+      _db,
+      finder: Finder(filter: Filter.equals('goalId', goalId)),
+    );
   }
 
   Future<void> deleteAll() async {
@@ -167,8 +185,12 @@ class PlanRepository {
       description: json['description'] as String? ?? '',
       goalId: json['goalId'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      startDate: json['startDate'] != null ? DateTime.tryParse(json['startDate'] as String) : null,
-      endDate: json['endDate'] != null ? DateTime.tryParse(json['endDate'] as String) : null,
+      startDate: json['startDate'] != null
+          ? DateTime.tryParse(json['startDate'] as String)
+          : null,
+      endDate: json['endDate'] != null
+          ? DateTime.tryParse(json['endDate'] as String)
+          : null,
       steps: (json['steps'] as List?)?.cast<String>() ?? [],
       status: PlanStatus.values.firstWhere(
         (s) => s.name == json['status'],
@@ -184,8 +206,12 @@ class PlanRepository {
       title: json['title'] as String,
       description: json['description'] as String? ?? '',
       createdAt: DateTime.parse(json['created_at'] as String),
-      startDate: json['start_date'] != null ? DateTime.tryParse(json['start_date'] as String) : null,
-      endDate: json['end_date'] != null ? DateTime.tryParse(json['end_date'] as String) : null,
+      startDate: json['start_date'] != null
+          ? DateTime.tryParse(json['start_date'] as String)
+          : null,
+      endDate: json['end_date'] != null
+          ? DateTime.tryParse(json['end_date'] as String)
+          : null,
       steps: (json['steps'] as List?)?.cast<String>() ?? [],
       status: PlanStatus.values.firstWhere(
         (s) => s.name == json['status'],

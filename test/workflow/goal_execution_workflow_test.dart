@@ -23,7 +23,7 @@ void main() {
       final goal = Goal.create(
         title: 'Launch Product X',
         description: 'Ship v1 by Q3',
-        type: GoalType.entrepreneurial,
+        type: GoalType.farm,
       );
       await goalRepo.save(goal);
 
@@ -97,21 +97,26 @@ void main() {
       expect(planner.tasks.first.title, 'Team standup');
     });
 
-    test('Step 3b: tasks can be assigned to specific pomodoro blocks',
-        () async {
-      final t1 = Task.create(title: 'Block 1 task', pomodoroBlock: 1);
-      final t2 = Task.create(title: 'Block 3 task', pomodoroBlock: 3);
-      final t3 = Task.create(title: 'Unassigned task');
+    test(
+      'Step 3b: tasks can be assigned to specific pomodoro blocks',
+      () async {
+        final t1 = Task.create(title: 'Block 1 task', pomodoroBlock: 1);
+        final t2 = Task.create(title: 'Block 3 task', pomodoroBlock: 3);
+        final t3 = Task.create(title: 'Unassigned task');
 
-      await plannerRepo.addTask(testDate, t1);
-      await plannerRepo.addTask(testDate, t2);
-      await plannerRepo.addTask(testDate, t3);
+        await plannerRepo.addTask(testDate, t1);
+        await plannerRepo.addTask(testDate, t2);
+        await plannerRepo.addTask(testDate, t3);
 
-      final planner = await plannerRepo.getDayPlannerByDate(testDate);
-      expect(planner!.tasks.where((t) => t.pomodoroBlock == 1), hasLength(1));
-      expect(planner.tasks.where((t) => t.pomodoroBlock == 3), hasLength(1));
-      expect(planner.tasks.where((t) => t.pomodoroBlock == null), hasLength(1));
-    });
+        final planner = await plannerRepo.getDayPlannerByDate(testDate);
+        expect(planner!.tasks.where((t) => t.pomodoroBlock == 1), hasLength(1));
+        expect(planner.tasks.where((t) => t.pomodoroBlock == 3), hasLength(1));
+        expect(
+          planner.tasks.where((t) => t.pomodoroBlock == null),
+          hasLength(1),
+        );
+      },
+    );
 
     test('Step 4: link a task to a plan via planId', () async {
       final plan = Plan.create(
@@ -146,19 +151,21 @@ void main() {
       expect(planner.pendingTasks, hasLength(1));
     });
 
-    test('Step 5b: toggleCompleted updates the task in the day planner',
-        () async {
-      final task = Task.create(title: 'Write tests');
-      await plannerRepo.addTask(testDate, task);
+    test(
+      'Step 5b: toggleCompleted updates the task in the day planner',
+      () async {
+        final task = Task.create(title: 'Write tests');
+        await plannerRepo.addTask(testDate, task);
 
-      var planner = await plannerRepo.getDayPlannerByDate(testDate);
-      expect(planner!.completionRate, 0.0);
+        var planner = await plannerRepo.getDayPlannerByDate(testDate);
+        expect(planner!.completionRate, 0.0);
 
-      await plannerRepo.updateTask(testDate, task.toggleCompleted());
+        await plannerRepo.updateTask(testDate, task.toggleCompleted());
 
-      planner = await plannerRepo.getDayPlannerByDate(testDate);
-      expect(planner!.completionRate, 1.0);
-    });
+        planner = await plannerRepo.getDayPlannerByDate(testDate);
+        expect(planner!.completionRate, 1.0);
+      },
+    );
 
     test('Step 5c: completion rate is 1.0 when all tasks are done', () async {
       final t1 = Task.create(title: 'T1');
@@ -199,18 +206,22 @@ void main() {
       );
       await goalRepo.save(goal);
 
-      await planRepo.save(Plan.create(
-        title: 'Plan A',
-        description: 'D',
-        goalId: goal.id,
-        status: PlanStatus.draft,
-      ));
-      await planRepo.save(Plan.create(
-        title: 'Plan B',
-        description: 'D',
-        goalId: goal.id,
-        status: PlanStatus.active,
-      ));
+      await planRepo.save(
+        Plan.create(
+          title: 'Plan A',
+          description: 'D',
+          goalId: goal.id,
+          status: PlanStatus.draft,
+        ),
+      );
+      await planRepo.save(
+        Plan.create(
+          title: 'Plan B',
+          description: 'D',
+          goalId: goal.id,
+          status: PlanStatus.active,
+        ),
+      );
 
       expect(await planRepo.getByGoalId(goal.id), hasLength(2));
 
@@ -225,7 +236,7 @@ void main() {
       final goal = Goal.create(
         title: 'E2E Goal',
         description: 'Full workflow test',
-        type: GoalType.entrepreneurial,
+        type: GoalType.farm,
         status: GoalStatus.inProgress,
       );
       await goalRepo.save(goal);
@@ -239,10 +250,16 @@ void main() {
       );
       await planRepo.save(plan);
 
-      final task1 =
-          Task.create(title: 'Work on Step A', planId: plan.id, pomodoroBlock: 1);
-      final task2 =
-          Task.create(title: 'Work on Step B', planId: plan.id, pomodoroBlock: 2);
+      final task1 = Task.create(
+        title: 'Work on Step A',
+        planId: plan.id,
+        pomodoroBlock: 1,
+      );
+      final task2 = Task.create(
+        title: 'Work on Step B',
+        planId: plan.id,
+        pomodoroBlock: 2,
+      );
       await plannerRepo.addTask(testDate, task1);
       await plannerRepo.addTask(testDate, task2);
 

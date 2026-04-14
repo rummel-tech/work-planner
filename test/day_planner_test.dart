@@ -87,10 +87,7 @@ void main() {
     test('removes task from day planner', () {
       final task1 = Task.create(title: 'Task 1');
       final task2 = Task.create(title: 'Task 2');
-      final planner = DayPlanner.create(
-        date: testDate,
-        tasks: [task1, task2],
-      );
+      final planner = DayPlanner.create(date: testDate, tasks: [task1, task2]);
 
       final updatedPlanner = planner.removeTask(task1.id);
 

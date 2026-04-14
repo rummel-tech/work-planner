@@ -61,8 +61,9 @@ void main() {
       expect(find.text('Today'), findsOneWidget);
     });
 
-    testWidgets("dashboard shows Today's Tasks and Active Goals sections",
-        (tester) async {
+    testWidgets("dashboard shows Today's Tasks and Active Goals sections", (
+      tester,
+    ) async {
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
 
@@ -92,10 +93,13 @@ void main() {
 
       // Fill the form
       await tester.enterText(
-          find.widgetWithText(TextFormField, 'Enter goal title'), 'Launch MVP');
+        find.widgetWithText(TextFormField, 'Enter goal title'),
+        'Launch MVP',
+      );
       await tester.enterText(
-          find.widgetWithText(TextFormField, 'Enter goal description'),
-          'Ship the first version');
+        find.widgetWithText(TextFormField, 'Enter goal description'),
+        'Ship the first version',
+      );
 
       // Submit
       await tester.tap(find.text('Create Goal'));
@@ -133,7 +137,9 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(
-          find.widgetWithText(TextFormField, 'Enter task title'), 'Write tests');
+        find.widgetWithText(TextFormField, 'Enter task title'),
+        'Write tests',
+      );
 
       await tester.tap(find.text('Create Task'));
       await tester.pumpAndSettle();
@@ -141,22 +147,27 @@ void main() {
       expect(find.text('Write tests'), findsOneWidget);
     });
 
-    testWidgets('task form validation blocks save when title is empty',
-        (tester) async {
+    testWidgets('task form validation blocks save when title is empty', (
+      tester,
+    ) async {
       final today = DateTime.now();
-      await tester.pumpWidget(MaterialApp(
-        theme: RummelBlueTheme.light(),
-        initialRoute: AppRouter.taskForm,
-        onGenerateRoute: (settings) {
-          if (settings.name == AppRouter.taskForm) {
-            return AppRouter.generateRoute(
-              RouteSettings(
-                  name: AppRouter.taskForm, arguments: {'date': today}),
-            );
-          }
-          return AppRouter.generateRoute(settings);
-        },
-      ));
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RummelBlueTheme.light(),
+          initialRoute: AppRouter.taskForm,
+          onGenerateRoute: (settings) {
+            if (settings.name == AppRouter.taskForm) {
+              return AppRouter.generateRoute(
+                RouteSettings(
+                  name: AppRouter.taskForm,
+                  arguments: {'date': today},
+                ),
+              );
+            }
+            return AppRouter.generateRoute(settings);
+          },
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Create Task'));
@@ -176,7 +187,10 @@ void main() {
       final date = DateTime(today.year, today.month, today.day);
 
       // Seed a task via the fake repository
-      await ServiceLocator.planners.addTask(date, Task.create(title: 'Finish report'));
+      await ServiceLocator.planners.addTask(
+        date,
+        Task.create(title: 'Finish report'),
+      );
 
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
@@ -189,7 +203,8 @@ void main() {
       await tester.tap(find.byType(Checkbox).first);
       await tester.pumpAndSettle();
 
-      final updatedPlanner = await ServiceLocator.planners.getOrCreateDayPlanner(date);
+      final updatedPlanner = await ServiceLocator.planners
+          .getOrCreateDayPlanner(date);
       expect(updatedPlanner.completedTasks.length, equals(1));
     });
   });
@@ -210,23 +225,25 @@ void main() {
       expect(find.text('Block 4'), findsOneWidget);
     });
 
-    testWidgets('tapping + for a block pre-selects that block in the task form',
-        (tester) async {
-      final date = DateTime(2025, 6, 16);
-      await tester.pumpWidget(buildDayPlannerApp(date));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'tapping + for a block pre-selects that block in the task form',
+      (tester) async {
+        final date = DateTime(2025, 6, 16);
+        await tester.pumpWidget(buildDayPlannerApp(date));
+        await tester.pumpAndSettle();
 
-      // Tap the "Add task to Block 2" icon button
-      await tester.tap(find.byTooltip('Add task to Block 2'));
-      await tester.pumpAndSettle();
+        // Tap the "Add task to Block 2" icon button
+        await tester.tap(find.byTooltip('Add task to Block 2'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('New Task'), findsOneWidget);
+        expect(find.text('New Task'), findsOneWidget);
 
-      final block2Chip = tester.widget<ChoiceChip>(
-        find.widgetWithText(ChoiceChip, 'Block 2'),
-      );
-      expect(block2Chip.selected, isTrue);
-    });
+        final block2Chip = tester.widget<ChoiceChip>(
+          find.widgetWithText(ChoiceChip, 'Block 2'),
+        );
+        expect(block2Chip.selected, isTrue);
+      },
+    );
 
     testWidgets('seeded task appears under its assigned block', (tester) async {
       final date = DateTime(2025, 6, 16);

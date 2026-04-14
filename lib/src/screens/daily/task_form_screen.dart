@@ -9,8 +9,16 @@ class TaskFormScreen extends StatefulWidget {
   final DateTime date;
   final String? initialPlanId;
   final int? initialPomodoroBlock;
+  final TaskCategory? initialTaskCategory;
 
-  const TaskFormScreen({super.key, this.task, required this.date, this.initialPlanId, this.initialPomodoroBlock});
+  const TaskFormScreen({
+    super.key,
+    this.task,
+    required this.date,
+    this.initialPlanId,
+    this.initialPomodoroBlock,
+    this.initialTaskCategory,
+  });
 
   @override
   State<TaskFormScreen> createState() => _TaskFormScreenState();
@@ -28,9 +36,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   int? _durationMinutes;
   String? _planId;
   int? _pomodoroBlock;
+  TaskCategory _taskCategory = TaskCategory.corporate;
   List<Plan> _availablePlans = [];
 
   bool get _isEditing => widget.task != null;
+  bool get _isCorporate => _taskCategory == TaskCategory.corporate;
 
   @override
   void initState() {
@@ -38,13 +48,19 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     _loadPlans();
     _planId = widget.initialPlanId;
     _pomodoroBlock = widget.initialPomodoroBlock;
+    _taskCategory =
+        widget.task?.taskCategory ??
+        widget.initialTaskCategory ??
+        TaskCategory.corporate;
+
     if (widget.task != null) {
       _titleController.text = widget.task!.title;
       _descriptionController.text = widget.task!.description ?? '';
       _priority = widget.task!.priority;
       _planId = widget.task!.planId ?? widget.initialPlanId;
       _durationMinutes = widget.task!.durationMinutes;
-      _pomodoroBlock = widget.task!.pomodoroBlock ?? widget.initialPomodoroBlock;
+      _pomodoroBlock =
+          widget.task!.pomodoroBlock ?? widget.initialPomodoroBlock;
       if (widget.task!.scheduledTime != null) {
         _scheduledTime = TimeOfDay(
           hour: widget.task!.scheduledTime!.hour,
@@ -94,18 +110,26 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       );
     }
 
+    // Pomodoro block only applies to corporate tasks
+    final effectiveBlock = _isCorporate ? _pomodoroBlock : null;
+
     if (_isEditing) {
       final updatedTask = widget.task!.copyWith(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim().isEmpty
             ? null
             : _descriptionController.text.trim(),
+        clearDescription: _descriptionController.text.trim().isEmpty,
         priority: _priority,
         scheduledTime: scheduledDateTime,
+        clearScheduledTime: scheduledDateTime == null,
         durationMinutes: _durationMinutes,
+        clearDurationMinutes: _durationMinutes == null,
         planId: _planId,
-        pomodoroBlock: _pomodoroBlock,
-        clearPomodoroBlock: _pomodoroBlock == null,
+        clearPlanId: _planId == null,
+        pomodoroBlock: effectiveBlock,
+        clearPomodoroBlock: effectiveBlock == null,
+        taskCategory: _taskCategory,
       );
       await _plannerRepository.updateTask(widget.date, updatedTask);
     } else {
@@ -118,7 +142,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         scheduledTime: scheduledDateTime,
         durationMinutes: _durationMinutes,
         planId: _planId,
-        pomodoroBlock: _pomodoroBlock,
+        pomodoroBlock: effectiveBlock,
+        taskCategory: _taskCategory,
       );
       await _plannerRepository.addTask(widget.date, newTask);
     }
@@ -135,14 +160,23 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     return '$hour:$minute $period';
   }
 
+  String _categoryLabel(TaskCategory cat) {
+    switch (cat) {
+      case TaskCategory.corporate:
+        return 'Corporate';
+      case TaskCategory.farm:
+        return 'Farm';
+      case TaskCategory.appDevelopment:
+        return 'App Dev';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Task' : 'New Task'),
-      ),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Task' : 'New Task')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -150,6 +184,29 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // --- Work context ---
+              Text('Work Context', style: theme.textTheme.titleMedium),
+              const SizedBox(height: 8),
+              SegmentedButton<TaskCategory>(
+                segments: TaskCategory.values
+                    .map(
+                      (cat) => ButtonSegment(
+                        value: cat,
+                        label: Text(_categoryLabel(cat)),
+                      ),
+                    )
+                    .toList(),
+                selected: {_taskCategory},
+                onSelectionChanged: (selection) {
+                  setState(() {
+                    _taskCategory = selection.first;
+                    if (!_isCorporate) _pomodoroBlock = null;
+                  });
+                },
+              ),
+              const SizedBox(height: 24),
+
+              // --- Title ---
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
@@ -175,25 +232,18 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                 maxLines: 2,
               ),
               const SizedBox(height: 24),
-              Text(
-                'Priority',
-                style: theme.textTheme.titleMedium,
-              ),
+
+              // --- Priority ---
+              Text('Priority', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               SegmentedButton<TaskPriority>(
                 segments: const [
-                  ButtonSegment(
-                    value: TaskPriority.low,
-                    label: Text('Low'),
-                  ),
+                  ButtonSegment(value: TaskPriority.low, label: Text('Low')),
                   ButtonSegment(
                     value: TaskPriority.medium,
-                    label: Text('Medium'),
+                    label: Text('Med'),
                   ),
-                  ButtonSegment(
-                    value: TaskPriority.high,
-                    label: Text('High'),
-                  ),
+                  ButtonSegment(value: TaskPriority.high, label: Text('High')),
                   ButtonSegment(
                     value: TaskPriority.urgent,
                     label: Text('Urgent'),
@@ -207,10 +257,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              Text(
-                'Schedule',
-                style: theme.textTheme.titleMedium,
-              ),
+
+              // --- Schedule ---
+              Text('Schedule', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -294,7 +343,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                                 ),
                                 DropdownMenuItem(
                                   value: 90,
-                                  child: Text('1.5 hours'),
+                                  child: Text('1.5 hrs'),
                                 ),
                                 DropdownMenuItem(
                                   value: 120,
@@ -334,28 +383,35 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                     child: const Text('Clear Time'),
                   ),
                 ),
-              const SizedBox(height: 24),
-              Text(
-                'Pomodoro Block (optional)',
-                style: theme.textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  ChoiceChip(
-                    label: const Text('None'),
-                    selected: _pomodoroBlock == null,
-                    onSelected: (_) => setState(() => _pomodoroBlock = null),
-                  ),
-                  for (int i = 1; i <= 4; i++)
+
+              // --- Pomodoro block (corporate only) ---
+              if (_isCorporate) ...[
+                const SizedBox(height: 24),
+                Text(
+                  'Pomodoro Block (optional)',
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
                     ChoiceChip(
-                      label: Text('Block $i'),
-                      selected: _pomodoroBlock == i,
-                      onSelected: (_) => setState(() => _pomodoroBlock = i),
+                      label: const Text('None'),
+                      selected: _pomodoroBlock == null,
+                      onSelected: (_) =>
+                          setState(() => _pomodoroBlock = null),
                     ),
-                ],
-              ),
+                    for (int i = 1; i <= 4; i++)
+                      ChoiceChip(
+                        label: Text('Block $i'),
+                        selected: _pomodoroBlock == i,
+                        onSelected: (_) =>
+                            setState(() => _pomodoroBlock = i),
+                      ),
+                  ],
+                ),
+              ],
+
               const SizedBox(height: 24),
               Text(
                 'Link to Plan (optional)',
@@ -369,14 +425,13 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   hintText: 'Select a plan',
                 ),
                 items: [
-                  const DropdownMenuItem(
-                    value: null,
-                    child: Text('None'),
+                  const DropdownMenuItem(value: null, child: Text('None')),
+                  ..._availablePlans.map(
+                    (plan) => DropdownMenuItem(
+                      value: plan.id,
+                      child: Text(plan.title),
+                    ),
                   ),
-                  ..._availablePlans.map((plan) => DropdownMenuItem(
-                        value: plan.id,
-                        child: Text(plan.title),
-                      )),
                 ],
                 onChanged: (value) {
                   setState(() {

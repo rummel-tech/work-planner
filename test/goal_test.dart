@@ -18,14 +18,14 @@ void main() {
       expect(goal.createdAt, isNotNull);
     });
 
-    test('creates entrepreneurial goal', () {
+    test('creates farm goal', () {
       final goal = Goal.create(
         title: 'Start side business',
         description: 'Launch consulting service',
-        type: GoalType.entrepreneurial,
+        type: GoalType.farm,
       );
 
-      expect(goal.type, GoalType.entrepreneurial);
+      expect(goal.type, GoalType.farm);
     });
 
     test('creates goal with target date', () {

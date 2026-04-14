@@ -28,11 +28,17 @@ void main() {
       });
 
       test('save updates an existing goal (upsert behaviour)', () async {
-        final goal =
-            Goal.create(title: 'Original', description: 'D', type: GoalType.corporate);
+        final goal = Goal.create(
+          title: 'Original',
+          description: 'D',
+          type: GoalType.corporate,
+        );
         await repo.save(goal);
 
-        final updated = goal.copyWith(title: 'Updated', status: GoalStatus.inProgress);
+        final updated = goal.copyWith(
+          title: 'Updated',
+          status: GoalStatus.inProgress,
+        );
         await repo.save(updated);
 
         final result = await repo.getById(goal.id);
@@ -43,36 +49,43 @@ void main() {
       test('getByType returns only goals of the requested type', () async {
         repo.seed([
           Goal.create(
-              id: 'c1', title: 'Corp', description: 'D', type: GoalType.corporate),
+            id: 'c1',
+            title: 'Corp',
+            description: 'D',
+            type: GoalType.corporate,
+          ),
           Goal.create(
-              id: 'e1',
-              title: 'Startup',
-              description: 'D',
-              type: GoalType.entrepreneurial),
+            id: 'e1',
+            title: 'Startup',
+            description: 'D',
+            type: GoalType.farm,
+          ),
         ]);
         final corp = await repo.getByType(GoalType.corporate);
         expect(corp, hasLength(1));
         expect(corp.first.type, GoalType.corporate);
 
-        final ent = await repo.getByType(GoalType.entrepreneurial);
+        final ent = await repo.getByType(GoalType.farm);
         expect(ent, hasLength(1));
-        expect(ent.first.type, GoalType.entrepreneurial);
+        expect(ent.first.type, GoalType.farm);
       });
 
       test('getByStatus filters by status correctly', () async {
         repo.seed([
           Goal.create(
-              id: 'g1',
-              title: 'Active',
-              description: 'D',
-              type: GoalType.corporate,
-              status: GoalStatus.inProgress),
+            id: 'g1',
+            title: 'Active',
+            description: 'D',
+            type: GoalType.corporate,
+            status: GoalStatus.inProgress,
+          ),
           Goal.create(
-              id: 'g2',
-              title: 'Done',
-              description: 'D',
-              type: GoalType.corporate,
-              status: GoalStatus.completed),
+            id: 'g2',
+            title: 'Done',
+            description: 'D',
+            type: GoalType.corporate,
+            status: GoalStatus.completed,
+          ),
         ]);
         final active = await repo.getByStatus(GoalStatus.inProgress);
         expect(active, hasLength(1));
@@ -82,39 +95,48 @@ void main() {
       test('getActive returns notStarted and inProgress goals', () async {
         repo.seed([
           Goal.create(
-              id: 'g1',
-              title: 'NotStarted',
-              description: 'D',
-              type: GoalType.corporate,
-              status: GoalStatus.notStarted),
+            id: 'g1',
+            title: 'NotStarted',
+            description: 'D',
+            type: GoalType.corporate,
+            status: GoalStatus.notStarted,
+          ),
           Goal.create(
-              id: 'g2',
-              title: 'InProgress',
-              description: 'D',
-              type: GoalType.corporate,
-              status: GoalStatus.inProgress),
+            id: 'g2',
+            title: 'InProgress',
+            description: 'D',
+            type: GoalType.corporate,
+            status: GoalStatus.inProgress,
+          ),
           Goal.create(
-              id: 'g3',
-              title: 'Completed',
-              description: 'D',
-              type: GoalType.corporate,
-              status: GoalStatus.completed),
+            id: 'g3',
+            title: 'Completed',
+            description: 'D',
+            type: GoalType.corporate,
+            status: GoalStatus.completed,
+          ),
           Goal.create(
-              id: 'g4',
-              title: 'Abandoned',
-              description: 'D',
-              type: GoalType.corporate,
-              status: GoalStatus.abandoned),
+            id: 'g4',
+            title: 'Abandoned',
+            description: 'D',
+            type: GoalType.corporate,
+            status: GoalStatus.abandoned,
+          ),
         ]);
         final active = await repo.getActive();
         expect(active, hasLength(2));
-        expect(active.map((g) => g.title),
-            containsAll(['NotStarted', 'InProgress']));
+        expect(
+          active.map((g) => g.title),
+          containsAll(['NotStarted', 'InProgress']),
+        );
       });
 
       test('delete removes a goal by id', () async {
-        final goal =
-            Goal.create(title: 'To Delete', description: 'D', type: GoalType.corporate);
+        final goal = Goal.create(
+          title: 'To Delete',
+          description: 'D',
+          type: GoalType.corporate,
+        );
         await repo.save(goal);
         await repo.delete(goal.id);
         expect(await repo.getById(goal.id), isNull);
@@ -123,8 +145,18 @@ void main() {
 
       test('deleteAll clears every goal', () async {
         repo.seed([
-          Goal.create(id: 'g1', title: 'A', description: 'D', type: GoalType.corporate),
-          Goal.create(id: 'g2', title: 'B', description: 'D', type: GoalType.corporate),
+          Goal.create(
+            id: 'g1',
+            title: 'A',
+            description: 'D',
+            type: GoalType.corporate,
+          ),
+          Goal.create(
+            id: 'g2',
+            title: 'B',
+            description: 'D',
+            type: GoalType.corporate,
+          ),
         ]);
         await repo.deleteAll();
         expect(await repo.getAll(), isEmpty);
@@ -192,21 +224,34 @@ void main() {
         final day2 = DateTime(2025, 6, 17);
         final day3 = DateTime(2025, 6, 18);
 
-        await repo.addTask(day1, Task.create(title: 'Mon task', planId: planId));
-        await repo.addTask(day2, Task.create(title: 'Tue task', planId: planId));
-        await repo.addTask(day3, Task.create(title: 'Unlinked task')); // different plan
+        await repo.addTask(
+          day1,
+          Task.create(title: 'Mon task', planId: planId),
+        );
+        await repo.addTask(
+          day2,
+          Task.create(title: 'Tue task', planId: planId),
+        );
+        await repo.addTask(
+          day3,
+          Task.create(title: 'Unlinked task'),
+        ); // different plan
 
         final tasks = await repo.getTasksForPlan(planId);
         expect(tasks, hasLength(2));
-        expect(tasks.map((t) => t.title),
-            containsAll(['Mon task', 'Tue task']));
+        expect(
+          tasks.map((t) => t.title),
+          containsAll(['Mon task', 'Tue task']),
+        );
       });
 
-      test('getTasksForPlan returns empty list when no tasks are linked',
-          () async {
-        await repo.addTask(testDate, Task.create(title: 'Unrelated'));
-        expect(await repo.getTasksForPlan('unknown-plan'), isEmpty);
-      });
+      test(
+        'getTasksForPlan returns empty list when no tasks are linked',
+        () async {
+          await repo.addTask(testDate, Task.create(title: 'Unrelated'));
+          expect(await repo.getTasksForPlan('unknown-plan'), isEmpty);
+        },
+      );
 
       test('getDayPlannersByDateRange returns planners in range', () async {
         final d1 = DateTime(2025, 6, 16);
@@ -227,8 +272,10 @@ void main() {
       });
 
       test('updateDayPlannerNotes persists notes', () async {
-        final updated =
-            await repo.updateDayPlannerNotes(testDate, 'Focus on deep work');
+        final updated = await repo.updateDayPlannerNotes(
+          testDate,
+          'Focus on deep work',
+        );
         expect(updated.notes, 'Focus on deep work');
       });
     });

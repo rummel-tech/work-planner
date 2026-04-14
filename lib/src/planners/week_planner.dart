@@ -5,15 +5,9 @@ class DayPlannerEntry {
   final int dayOfWeek;
   final String dayPlannerId;
 
-  const DayPlannerEntry({
-    required this.dayOfWeek,
-    required this.dayPlannerId,
-  });
+  const DayPlannerEntry({required this.dayOfWeek, required this.dayPlannerId});
 
-  DayPlannerEntry.create({
-    required this.dayOfWeek,
-    required this.dayPlannerId,
-  });
+  DayPlannerEntry.create({required this.dayOfWeek, required this.dayPlannerId});
 }
 
 /// Represents a weekly planner
@@ -39,12 +33,16 @@ class WeekPlanner {
     List<String>? weeklyGoals,
     String? notes,
   }) : this._(
-          id: id ?? const Uuid().v4(),
-          weekStartDate: DateTime(weekStartDate.year, weekStartDate.month, weekStartDate.day),
-          dailyPlannerEntries: dailyPlannerEntries ?? const [],
-          weeklyGoals: weeklyGoals ?? const [],
-          notes: notes,
-        );
+         id: id ?? const Uuid().v4(),
+         weekStartDate: DateTime(
+           weekStartDate.year,
+           weekStartDate.month,
+           weekStartDate.day,
+         ),
+         dailyPlannerEntries: dailyPlannerEntries ?? const [],
+         weeklyGoals: weeklyGoals ?? const [],
+         notes: notes,
+       );
 
   DateTime get weekEndDate => weekStartDate.add(const Duration(days: 6));
 
@@ -57,7 +55,9 @@ class WeekPlanner {
     return WeekPlanner._(
       id: id,
       weekStartDate: weekStartDate ?? this.weekStartDate,
-      dailyPlannerEntries: dailyPlannerEntries ?? List<DayPlannerEntry>.from(this.dailyPlannerEntries),
+      dailyPlannerEntries:
+          dailyPlannerEntries ??
+          List<DayPlannerEntry>.from(this.dailyPlannerEntries),
       weeklyGoals: weeklyGoals ?? List<String>.from(this.weeklyGoals),
       notes: notes ?? this.notes,
     );
@@ -65,21 +65,24 @@ class WeekPlanner {
 
   WeekPlanner addDailyPlannerEntry(int dayOfWeek, String dayPlannerId) {
     if (dayOfWeek < 0 || dayOfWeek > 6) {
-      throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
+      throw ArgumentError(
+        'dayOfWeek must be between 0 (Monday) and 6 (Sunday)',
+      );
     }
     final updatedEntries = dailyPlannerEntries
         .where((e) => e.dayOfWeek != dayOfWeek)
         .toList();
-    updatedEntries.add(DayPlannerEntry.create(
-      dayOfWeek: dayOfWeek,
-      dayPlannerId: dayPlannerId,
-    ));
+    updatedEntries.add(
+      DayPlannerEntry.create(dayOfWeek: dayOfWeek, dayPlannerId: dayPlannerId),
+    );
     return copyWith(dailyPlannerEntries: updatedEntries);
   }
 
   WeekPlanner removeDailyPlannerEntry(int dayOfWeek) {
     if (dayOfWeek < 0 || dayOfWeek > 6) {
-      throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
+      throw ArgumentError(
+        'dayOfWeek must be between 0 (Monday) and 6 (Sunday)',
+      );
     }
     final updatedEntries = dailyPlannerEntries
         .where((e) => e.dayOfWeek != dayOfWeek)
@@ -89,7 +92,9 @@ class WeekPlanner {
 
   String? getDayPlannerId(int dayOfWeek) {
     if (dayOfWeek < 0 || dayOfWeek > 6) {
-      throw ArgumentError('dayOfWeek must be between 0 (Monday) and 6 (Sunday)');
+      throw ArgumentError(
+        'dayOfWeek must be between 0 (Monday) and 6 (Sunday)',
+      );
     }
     try {
       return dailyPlannerEntries

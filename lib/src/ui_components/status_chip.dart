@@ -37,10 +37,7 @@ class GoalStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
-      label: Text(
-        _label,
-        style: TextStyle(color: _color, fontSize: 12),
-      ),
+      label: Text(_label, style: TextStyle(color: _color, fontSize: 12)),
       backgroundColor: _color.withAlpha(30),
       side: BorderSide(color: _color),
       padding: EdgeInsets.zero,
@@ -83,10 +80,7 @@ class PlanStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
-      label: Text(
-        _label,
-        style: TextStyle(color: _color, fontSize: 12),
-      ),
+      label: Text(_label, style: TextStyle(color: _color, fontSize: 12)),
       backgroundColor: _color.withAlpha(30),
       side: BorderSide(color: _color),
       padding: EdgeInsets.zero,

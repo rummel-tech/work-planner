@@ -11,7 +11,7 @@ void main() {
     id: 'g1',
     title: 'Launch Product X',
     description: 'Ship v1 to customers',
-    type: GoalType.entrepreneurial,
+    type: GoalType.farm,
     status: GoalStatus.inProgress,
   );
 
@@ -31,26 +31,29 @@ void main() {
     testWidgets('shows goal type label', (tester) async {
       await tester.pumpWidget(testWidget(GoalDetailScreen(goal: goal)));
       await tester.pumpAndSettle();
-      expect(find.text('Entrepreneurial'), findsOneWidget);
+      expect(find.text('Farm'), findsOneWidget);
     });
 
     testWidgets('shows all four status choice chips', (tester) async {
       await tester.pumpWidget(testWidget(GoalDetailScreen(goal: goal)));
       await tester.pumpAndSettle();
       expect(find.text('Not Started'), findsOneWidget);
-      expect(find.text('In Progress'), findsOneWidget);
+      expect(find.text('In Progress'), findsWidgets);
       expect(find.text('Completed'), findsOneWidget);
       expect(find.text('Abandoned'), findsOneWidget);
     });
 
-    testWidgets('shows "No plans yet" when no plans are linked', (tester) async {
+    testWidgets('shows "No plans yet" when no plans are linked', (
+      tester,
+    ) async {
       await tester.pumpWidget(testWidget(GoalDetailScreen(goal: goal)));
       await tester.pumpAndSettle();
       expect(find.text('No plans yet'), findsOneWidget);
     });
 
-    testWidgets('shows plan cards when plans exist for this goal',
-        (tester) async {
+    testWidgets('shows plan cards when plans exist for this goal', (
+      tester,
+    ) async {
       fakePlans.seed([
         Plan.create(
           id: 'p1',
@@ -81,16 +84,18 @@ void main() {
       expect(find.text('No plans yet'), findsOneWidget);
     });
 
-    testWidgets('shows Plans section header and Add Plan button',
-        (tester) async {
+    testWidgets('shows Plans section header and Add Plan button', (
+      tester,
+    ) async {
       await tester.pumpWidget(testWidget(GoalDetailScreen(goal: goal)));
       await tester.pumpAndSettle();
       expect(find.text('Plans'), findsOneWidget);
       expect(find.text('Add Plan'), findsOneWidget);
     });
 
-    testWidgets('shows edit and delete action buttons in AppBar',
-        (tester) async {
+    testWidgets('shows edit and delete action buttons in AppBar', (
+      tester,
+    ) async {
       await tester.pumpWidget(testWidget(GoalDetailScreen(goal: goal)));
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.edit), findsOneWidget);

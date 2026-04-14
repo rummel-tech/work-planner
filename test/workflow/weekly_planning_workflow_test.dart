@@ -24,26 +24,36 @@ void main() {
       expect(first.id, second.id);
     });
 
-    test('normalises time component — same date at different times is one planner',
-        () async {
-      final withTime = DateTime(2025, 6, 16, 9, 30);
-      final noTime = DateTime(2025, 6, 16);
-      final first = await plannerRepo.getOrCreateWeekPlanner(withTime);
-      final second = await plannerRepo.getOrCreateWeekPlanner(noTime);
-      expect(first.id, second.id);
-    });
+    test(
+      'normalises time component — same date at different times is one planner',
+      () async {
+        final withTime = DateTime(2025, 6, 16, 9, 30);
+        final noTime = DateTime(2025, 6, 16);
+        final first = await plannerRepo.getOrCreateWeekPlanner(withTime);
+        final second = await plannerRepo.getOrCreateWeekPlanner(noTime);
+        expect(first.id, second.id);
+      },
+    );
 
     test('add weekly goals', () async {
       final goals = ['Complete sprint', 'Prepare presentation', 'Review OKRs'];
-      final planner = await plannerRepo.updateWeekPlannerGoals(weekStart, goals);
+      final planner = await plannerRepo.updateWeekPlannerGoals(
+        weekStart,
+        goals,
+      );
       expect(planner.weeklyGoals, goals);
     });
 
     test('remove a weekly goal', () async {
-      await plannerRepo.updateWeekPlannerGoals(
-          weekStart, ['Goal A', 'Goal B', 'Goal C']);
-      final updated = await plannerRepo.updateWeekPlannerGoals(
-          weekStart, ['Goal A', 'Goal C']);
+      await plannerRepo.updateWeekPlannerGoals(weekStart, [
+        'Goal A',
+        'Goal B',
+        'Goal C',
+      ]);
+      final updated = await plannerRepo.updateWeekPlannerGoals(weekStart, [
+        'Goal A',
+        'Goal C',
+      ]);
       expect(updated.weeklyGoals, ['Goal A', 'Goal C']);
       expect(updated.weeklyGoals, isNot(contains('Goal B')));
     });
@@ -56,7 +66,9 @@ void main() {
 
     test('update notes for the week', () async {
       final planner = await plannerRepo.updateWeekPlannerNotes(
-          weekStart, 'Focus on delivery this week');
+        weekStart,
+        'Focus on delivery this week',
+      );
       expect(planner.notes, 'Focus on delivery this week');
     });
 
@@ -73,14 +85,19 @@ void main() {
       expect(planner.weekEndDate, weekStart.add(const Duration(days: 6)));
     });
 
-    test('getCurrentWeekPlanner returns a planner whose start is this Monday',
-        () async {
-      final planner = await plannerRepo.getCurrentWeekPlanner();
-      final now = DateTime.now();
-      final expectedStart = DateTime(now.year, now.month, now.day)
-          .subtract(Duration(days: now.weekday - 1));
-      expect(planner.weekStartDate, expectedStart);
-    });
+    test(
+      'getCurrentWeekPlanner returns a planner whose start is this Monday',
+      () async {
+        final planner = await plannerRepo.getCurrentWeekPlanner();
+        final now = DateTime.now();
+        final expectedStart = DateTime(
+          now.year,
+          now.month,
+          now.day,
+        ).subtract(Duration(days: now.weekday - 1));
+        expect(planner.weekStartDate, expectedStart);
+      },
+    );
 
     test('different week starts produce different planners', () async {
       final week1 = await plannerRepo.getOrCreateWeekPlanner(weekStart);

@@ -50,7 +50,9 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
     final date = await showDatePicker(
       context: context,
       initialDate: _startDate ?? today,
-      firstDate: _isEditing ? DateTime(2000) : today.subtract(const Duration(days: 365)),
+      firstDate: _isEditing
+          ? DateTime(2000)
+          : today.subtract(const Duration(days: 365)),
       lastDate: today.add(const Duration(days: 365 * 5)),
     );
     if (date != null) {
@@ -91,7 +93,9 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
         description: _descriptionController.text.trim(),
         status: _status,
         startDate: _startDate,
+        clearStartDate: _startDate == null,
         endDate: _endDate,
+        clearEndDate: _endDate == null,
       );
     } else {
       plan = Plan.create(
@@ -119,9 +123,7 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Plan' : 'New Plan'),
-      ),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Plan' : 'New Plan')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -160,10 +162,7 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
                 },
               ),
               const SizedBox(height: 24),
-              Text(
-                'Status',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text('Status', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -180,10 +179,7 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 24),
-              Text(
-                'Date Range',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text('Date Range', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Row(
                 children: [

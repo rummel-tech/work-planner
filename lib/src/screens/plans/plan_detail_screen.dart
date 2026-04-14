@@ -197,10 +197,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
               _refreshPlan();
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: _deletePlan,
-          ),
+          IconButton(icon: const Icon(Icons.delete), onPressed: _deletePlan),
         ],
       ),
       body: RefreshIndicator(
@@ -272,10 +269,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Status',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text('Status', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -292,10 +286,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Steps',
-                    style: theme.textTheme.titleMedium,
-                  ),
+                  Text('Steps', style: theme.textTheme.titleMedium),
                   TextButton.icon(
                     onPressed: _addStep,
                     icon: const Icon(Icons.add),

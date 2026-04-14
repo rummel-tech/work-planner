@@ -43,7 +43,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final result = await _authService.register(
         email: _emailController.text.trim(),
         password: _passwordController.text,
-        fullName: _nameController.text.trim().isEmpty ? null : _nameController.text.trim(),
+        fullName: _nameController.text.trim().isEmpty
+            ? null
+            : _nameController.text.trim(),
         registrationCode: _codeController.text.trim().isEmpty
             ? null
             : _codeController.text.trim().toUpperCase(),
@@ -52,16 +54,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
 
       if (result['status'] == 'registered') {
-        Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRouter.home,
+          (_) => false,
+        );
       } else if (result['status'] == 'waitlisted') {
-        setState(() => _successMessage = result['message'] as String? ?? "You've been added to the waitlist.");
+        setState(
+          () => _successMessage =
+              result['message'] as String? ??
+              "You've been added to the waitlist.",
+        );
       } else {
-        setState(() => _errorMessage = result['message'] as String? ?? 'Registration failed.');
+        setState(
+          () => _errorMessage =
+              result['message'] as String? ?? 'Registration failed.',
+        );
       }
     } on AuthException catch (e) {
       setState(() => _errorMessage = e.message);
     } catch (_) {
-      setState(() => _errorMessage = 'Unable to connect. Check your network and try again.');
+      setState(
+        () => _errorMessage =
+            'Unable to connect. Check your network and try again.',
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -118,7 +134,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
                     ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
                 validator: (v) {
@@ -163,7 +180,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   child: Text(
                     _successMessage!,
-                    style: TextStyle(color: theme.colorScheme.onPrimaryContainer),
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimaryContainer,
+                    ),
                   ),
                 ),
               ],
@@ -180,7 +199,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, AppRouter.login),
+                onPressed: () =>
+                    Navigator.pushReplacementNamed(context, AppRouter.login),
                 child: const Text('Already have an account? Sign In'),
               ),
             ],

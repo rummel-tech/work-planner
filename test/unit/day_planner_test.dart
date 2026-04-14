@@ -9,15 +9,14 @@ void main() {
     bool completed = false,
     int? pomodoroBlock,
     String? planId,
-  }) =>
-      Task.create(
-        id: id,
-        title: title,
-        priority: priority,
-        completed: completed,
-        pomodoroBlock: pomodoroBlock,
-        planId: planId,
-      );
+  }) => Task.create(
+    id: id,
+    title: title,
+    priority: priority,
+    completed: completed,
+    pomodoroBlock: pomodoroBlock,
+    planId: planId,
+  );
 
   group('Task', () {
     group('Task.create', () {
@@ -67,7 +66,8 @@ void main() {
       test('updates priority', () {
         expect(
           makeTask().copyWith(priority: TaskPriority.urgent).priority,
-          equals(TaskPriority.urgent));
+          equals(TaskPriority.urgent),
+        );
       });
 
       test('updates pomodoroBlock', () {
@@ -98,8 +98,7 @@ void main() {
 
     group('DayPlanner.create', () {
       test('normalises date to midnight', () {
-        final dp = DayPlanner.create(
-          date: DateTime(2025, 6, 15, 14, 30));
+        final dp = DayPlanner.create(date: DateTime(2025, 6, 15, 14, 30));
         expect(dp.date, equals(DateTime(2025, 6, 15)));
       });
 
@@ -196,7 +195,9 @@ void main() {
 
         final block1 = dp.tasks.where((t) => t.pomodoroBlock == 1).toList();
         final block2 = dp.tasks.where((t) => t.pomodoroBlock == 2).toList();
-        final unassigned = dp.tasks.where((t) => t.pomodoroBlock == null).toList();
+        final unassigned = dp.tasks
+            .where((t) => t.pomodoroBlock == null)
+            .toList();
 
         expect(block1.length, equals(2));
         expect(block2.length, equals(1));
@@ -215,12 +216,15 @@ void main() {
 
   group('TaskPriority enum', () {
     test('all cases exist', () {
-      expect(TaskPriority.values, containsAll([
-        TaskPriority.low,
-        TaskPriority.medium,
-        TaskPriority.high,
-        TaskPriority.urgent,
-      ]));
+      expect(
+        TaskPriority.values,
+        containsAll([
+          TaskPriority.low,
+          TaskPriority.medium,
+          TaskPriority.high,
+          TaskPriority.urgent,
+        ]),
+      );
     });
   });
 }

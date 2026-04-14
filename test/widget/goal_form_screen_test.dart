@@ -27,12 +27,13 @@ void main() {
       expect(find.widgetWithText(TextFormField, 'Description'), findsOneWidget);
     });
 
-    testWidgets('shows Corporate and Entrepreneurial type segments',
-        (tester) async {
+    testWidgets('shows goal type dropdown defaulting to Corporate', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
+      // Dropdown shows the currently selected value; Corporate is the default
       expect(find.text('Corporate'), findsOneWidget);
-      expect(find.text('Entrepreneurial'), findsOneWidget);
     });
 
     testWidgets('shows status choice chips', (tester) async {
@@ -50,33 +51,43 @@ void main() {
       expect(find.text('Create Goal'), findsOneWidget);
     });
 
-    testWidgets('shows target date section with "No date selected"',
-        (tester) async {
+    testWidgets('shows target date section with "No date selected"', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
       expect(find.text('Target Date'), findsOneWidget);
       expect(find.text('No date selected'), findsOneWidget);
     });
 
-    testWidgets('shows title validation error when title is empty',
-        (tester) async {
+    testWidgets('shows title validation error when title is empty', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Create Goal'));
+      final submitBtn = find.widgetWithText(FilledButton, 'Create Goal');
+      await tester.ensureVisible(submitBtn);
+      await tester.tap(submitBtn);
       await tester.pumpAndSettle();
       expect(find.text('Please enter a title'), findsOneWidget);
     });
 
-    testWidgets('shows description validation error when description is empty',
-        (tester) async {
-      await tester.pumpWidget(buildScreen());
-      await tester.pumpAndSettle();
-      await tester.enterText(
-          find.widgetWithText(TextFormField, 'Title'), 'My Goal');
-      await tester.tap(find.text('Create Goal'));
-      await tester.pumpAndSettle();
-      expect(find.text('Please enter a description'), findsOneWidget);
-    });
+    testWidgets(
+      'shows description validation error when description is empty',
+      (tester) async {
+        await tester.pumpWidget(buildScreen());
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.widgetWithText(TextFormField, 'Title'),
+          'My Goal',
+        );
+        final submitBtn = find.widgetWithText(FilledButton, 'Create Goal');
+        await tester.ensureVisible(submitBtn);
+        await tester.tap(submitBtn);
+        await tester.pumpAndSettle();
+        expect(find.text('Please enter a description'), findsOneWidget);
+      },
+    );
   });
 
   group('GoalFormScreen — edit mode', () {
@@ -84,7 +95,7 @@ void main() {
       id: 'g1',
       title: 'Existing Goal',
       description: 'Already saved',
-      type: GoalType.entrepreneurial,
+      type: GoalType.farm,
       status: GoalStatus.inProgress,
     );
 
@@ -96,8 +107,9 @@ void main() {
       expect(find.text('Edit Goal'), findsOneWidget);
     });
 
-    testWidgets('pre-fills title and description from the existing goal',
-        (tester) async {
+    testWidgets('pre-fills title and description from the existing goal', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
       expect(find.text('Existing Goal'), findsOneWidget);

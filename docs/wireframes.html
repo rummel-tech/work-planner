@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Work Planner — Wireframes</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f0f0;
+      color: #1a1a1a;
+      padding: 32px 24px;
+    }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #666; margin-bottom: 36px; }
+
+    /* ── Section headers ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #999;
+      margin: 48px 0 16px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    /* ── Screen grid ── */
+    .screens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+    }
+
+    /* ── Phone shell ── */
+    .phone {
+      width: 320px;
+      flex-shrink: 0;
+    }
+    .phone-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      text-align: center;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .phone-shell {
+      background: #fff;
+      border-radius: 28px;
+      border: 2.5px solid #333;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+      position: relative;
+    }
+
+    /* Status bar */
+    .status-bar {
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #333;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* App bar */
+    .app-bar {
+      background: #fff;
+      padding: 14px 16px 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #ececec;
+    }
+    .app-bar .back { font-size: 18px; color: #555; line-height: 1; }
+    .app-bar .title { font-size: 18px; font-weight: 700; flex: 1; }
+    .app-bar .actions { display: flex; gap: 6px; }
+    .app-bar .actions span { font-size: 18px; color: #555; cursor: pointer; }
+
+    /* Screen body */
+    .screen-body {
+      min-height: 500px;
+      padding: 14px;
+      background: #fafafa;
+      overflow: hidden;
+    }
+
+    /* Offline banner */
+    .offline-banner {
+      background: #fff3cd;
+      border-bottom: 1px solid #ffc107;
+      padding: 5px 14px;
+      font-size: 11px;
+      color: #856404;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      background: #fff;
+      border-top: 1px solid #ececec;
+      display: flex;
+      padding: 6px 0 8px;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: #888;
+      cursor: pointer;
+    }
+    .nav-item.active { color: #1565C0; }
+    .nav-item .nav-icon { font-size: 20px; }
+    .nav-item .nav-label { font-size: 10px; font-weight: 500; }
+
+    /* Cards */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8e8e8;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    }
+    .card-sm { padding: 10px 14px; }
+
+    /* Typography helpers */
+    .text-xs  { font-size: 10px; }
+    .text-sm  { font-size: 12px; }
+    .text-md  { font-size: 14px; }
+    .text-lg  { font-size: 16px; font-weight: 700; }
+    .text-xl  { font-size: 18px; font-weight: 700; }
+    .muted    { color: #888; }
+    .primary  { color: #1565C0; }
+
+    /* Flex helpers */
+    .row      { display: flex; align-items: center; gap: 8px; }
+    .row-sb   { display: flex; align-items: center; justify-content: space-between; }
+    .col      { display: flex; flex-direction: column; gap: 4px; }
+    .flex-1   { flex: 1; }
+
+    /* Completion circle */
+    .completion-circle {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 4px solid #1565C0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #1565C0;
+      flex-shrink: 0;
+    }
+
+    /* Section heading inside screen */
+    .section-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .section-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .link-btn { font-size: 12px; color: #1565C0; font-weight: 500; }
+
+    /* Task tile */
+    .task-tile {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .task-tile:last-child { border-bottom: none; }
+    .checkbox {
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      border: 2px solid #aaa;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .checkbox.checked { background: #1565C0; border-color: #1565C0; }
+    .priority-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 5px;
+    }
+    .p-low    { background: #4caf50; }
+    .p-med    { background: #ff9800; }
+    .p-high   { background: #f44336; }
+    .p-urgent { background: #9c27b0; }
+
+    /* Goal card */
+    .goal-card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e8e8e8;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .goal-type-badge {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 20px;
+      background: #e3f2fd; color: #1565C0;
+      display: inline-block; margin-bottom: 6px;
+    }
+    .goal-type-badge.entre  { background: #f3e5f5; color: #6a1b9a; }
+    .goal-type-badge.farm   { background: #e8f5e9; color: #2e7d32; }
+    .goal-type-badge.appdev { background: #fff3e0; color: #e65100; }
+    .goal-type-badge.homeauto { background: #f3e5f5; color: #6a1b9a; }
+
+    /* Status chip */
+    .chip {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px; display: inline-block;
+    }
+    .chip-blue   { background: #e3f2fd; color: #1565C0; }
+    .chip-green  { background: #e8f5e9; color: #2e7d32; }
+    .chip-amber  { background: #fff8e1; color: #e65100; }
+    .chip-grey   { background: #f5f5f5; color: #555; }
+    .chip-red    { background: #fce4ec; color: #b71c1c; }
+
+    /* Choice chips */
+    .choice-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 14px; }
+    .choice-chip {
+      font-size: 11px; padding: 4px 12px;
+      border-radius: 20px; border: 1.5px solid #ddd;
+      background: #fff; color: #555; cursor: pointer;
+    }
+    .choice-chip.selected { border-color: #1565C0; background: #e3f2fd; color: #1565C0; font-weight: 600; }
+
+    /* Segmented button */
+    .segmented-btn {
+      display: flex; border: 1.5px solid #1565C0; border-radius: 8px;
+      overflow: hidden; margin-bottom: 14px;
+    }
+    .seg {
+      flex: 1; text-align: center; font-size: 11px; font-weight: 500;
+      padding: 6px 4px; color: #1565C0; background: #fff; border-right: 1px solid #1565C0;
+      cursor: pointer;
+    }
+    .seg:last-child { border-right: none; }
+    .seg.selected { background: #1565C0; color: #fff; }
+
+    /* FAB */
+    .fab {
+      width: 50px; height: 50px; border-radius: 14px;
+      background: #1565C0; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; position: absolute; bottom: 70px; right: 16px;
+      box-shadow: 0 4px 12px rgba(21,101,192,.4);
+    }
+
+    /* Pomodoro block */
+    .pomo-block {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e8e8e8;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .pomo-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      background: #fafafa; border-bottom: 1px solid #f0f0f0;
+    }
+    .pomo-number {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #e3f2fd; color: #1565C0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .pomo-body { padding: 8px 12px; }
+
+    /* Form fields */
+    .field {
+      margin-bottom: 14px;
+    }
+    .field label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: #555; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .field-input {
+      width: 100%; border: 1.5px solid #ccc; border-radius: 8px;
+      padding: 8px 10px; font-size: 13px; color: #222; background: #fff;
+    }
+    .field-input.multiline { height: 52px; }
+    .field-input.focused { border-color: #1565C0; }
+
+    /* Filled button */
+    .btn-filled {
+      width: 100%; background: #1565C0; color: #fff;
+      border: none; border-radius: 10px; padding: 12px;
+      font-size: 14px; font-weight: 600; text-align: center; cursor: pointer;
+      margin-top: 8px;
+    }
+    .btn-outline {
+      width: 100%; background: #fff; color: #1565C0;
+      border: 1.5px solid #1565C0; border-radius: 10px; padding: 10px;
+      font-size: 13px; font-weight: 600; text-align: center; cursor: pointer;
+      margin-top: 6px;
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      display: flex; border-bottom: 2px solid #e8e8e8; background: #fff;
+    }
+    .tab {
+      flex: 1; text-align: center; font-size: 12px; font-weight: 500;
+      padding: 10px 4px; color: #888; cursor: pointer;
+    }
+    .tab.active { color: #1565C0; border-bottom: 2px solid #1565C0; margin-bottom: -2px; }
+
+    /* Week day row */
+    .week-day-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: #fff; border-radius: 10px; border: 1px solid #e8e8e8;
+      margin-bottom: 8px;
+    }
+    .week-day-row.today { background: #e3f2fd; border-color: #90caf9; }
+    .day-label { width: 36px; text-align: center; }
+    .day-label .dow { font-size: 10px; color: #888; }
+    .day-label .dom { font-size: 15px; font-weight: 700; }
+    .day-progress { flex: 1; font-size: 12px; color: #444; }
+    .mini-progress {
+      width: 28px; height: 28px;
+      border-radius: 50%; border: 3px solid #1565C0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #1565C0; flex-shrink: 0;
+    }
+    .mini-progress.empty { border-color: #ddd; color: #ccc; }
+
+    /* Plan step */
+    .plan-step {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; background: #fff;
+      border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 6px;
+    }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #e3f2fd; color: #1565C0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+
+    /* Auth illustration placeholder */
+    .auth-illustration {
+      width: 100px; height: 100px; border-radius: 50%;
+      background: #e3f2fd; margin: 20px auto 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+    }
+
+    /* Dropdown */
+    .dropdown {
+      width: 100%; border: 1.5px solid #ccc; border-radius: 8px;
+      padding: 8px 10px; font-size: 13px; background: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    /* Progress bar */
+    .progress-bar-wrap { background: #e0e0e0; border-radius: 4px; height: 6px; margin-top: 6px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #1565C0; border-radius: 4px; }
+
+    /* Empty state */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 24px; color: #aaa; font-size: 12px; gap: 8px;
+    }
+    .empty-state .empty-icon { font-size: 40px; }
+
+    /* Notes field */
+    .notes-field {
+      border: 1.5px solid #ccc; border-radius: 8px;
+      padding: 8px; font-size: 12px; color: #888;
+      min-height: 52px; background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Work Planner — Wireframes</h1>
+  <p class="subtitle">All screens based on the actual Flutter implementation · April 2026</p>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- SECTION: Auth flow                       -->
+  <!-- ─────────────────────────────────────── -->
+  <div class="section-label">Auth Flow</div>
+  <div class="screens">
+
+    <!-- Welcome screen -->
+    <div class="phone">
+      <div class="phone-label">Welcome</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="screen-body" style="display:flex;flex-direction:column;align-items:center;padding:32px 24px;">
+          <div class="auth-illustration">📋</div>
+          <div class="text-xl" style="text-align:center;margin-bottom:8px;">Work Planner</div>
+          <div class="text-sm muted" style="text-align:center;margin-bottom:36px;">
+            Structure your goals, plans, and daily work in one place.
+          </div>
+          <div class="btn-filled" style="margin-bottom:10px;">Sign In</div>
+          <div class="btn-outline">Create Account</div>
+          <div class="text-xs muted" style="margin-top:20px;text-align:center;">
+            Want early access? Join the waitlist →
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login screen -->
+    <div class="phone">
+      <div class="phone-label">Login</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title">Sign In</span>
+        </div>
+        <div class="screen-body">
+          <div style="height:16px;"></div>
+          <div class="field">
+            <label>Email</label>
+            <div class="field-input">user@example.com</div>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="field-input">••••••••</div>
+          </div>
+          <div class="btn-filled" style="margin-top:20px;">Sign In</div>
+          <div style="text-align:center;margin-top:16px;">
+            <span class="text-sm muted">Don't have an account? </span>
+            <span class="text-sm primary">Register</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Register screen -->
+    <div class="phone">
+      <div class="phone-label">Register</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title">Create Account</span>
+        </div>
+        <div class="screen-body">
+          <div style="height:8px;"></div>
+          <div class="field">
+            <label>Email</label>
+            <div class="field-input field-input.focused">user@example.com</div>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <div class="field-input">••••••••</div>
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <div class="field-input">••••••••</div>
+          </div>
+          <div class="field">
+            <label>Invite Code</label>
+            <div class="field-input">XXXX-XXXX</div>
+          </div>
+          <div class="btn-filled">Create Account</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /auth screens -->
+
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- SECTION: Main tabs (Home screen)        -->
+  <!-- ─────────────────────────────────────── -->
+  <div class="section-label">Main Tabs — Bottom Navigation</div>
+  <div class="screens">
+
+    <!-- Tab 1: Home — Dashboard (4 tab states) -->
+
+    <!-- Corp Tab active -->
+    <div class="phone">
+      <div class="phone-label">Home — Corp Tab</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="screen-body">
+          <div class="card" style="margin-bottom:10px;">
+            <div class="row">
+              <div class="completion-circle">74%</div>
+              <div class="col flex-1">
+                <div class="text-md" style="font-weight:600;">Week Progress</div>
+                <div class="text-sm muted">14 / 19 tasks · Mon–Sun</div>
+              </div>
+              <span style="font-size:20px;color:#aaa;">›</span>
+            </div>
+          </div>
+          <div class="tab-bar" style="margin-bottom:10px;">
+            <div class="tab active" style="font-size:10px;padding:8px 2px;">Corp</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Farm</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">App Dev</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Home &amp; Auto</div>
+          </div>
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">Goals</div>
+            <span class="link-btn">View All</span>
+          </div>
+          <div class="row" style="margin-bottom:12px;gap:6px;">
+            <div style="flex:1;background:#e3f2fd;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#1565C0;text-transform:uppercase;margin-bottom:3px;">💼 Corp</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Launch v2.0 API</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">In Progress</div>
+            </div>
+            <div style="flex:1;background:#e3f2fd;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#1565C0;text-transform:uppercase;margin-bottom:3px;">💼 Corp</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Hire Backend Eng</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">Not Started</div>
+            </div>
+            <div style="flex:1;background:#e3f2fd;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#1565C0;text-transform:uppercase;margin-bottom:3px;">💼 Corp</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Q2 OKR Review</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">In Progress</div>
+            </div>
+          </div>
+          <div class="section-title" style="font-size:13px;margin-bottom:8px;">Today's Pomodoros</div>
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">1</div>
+              <div class="text-sm flex-1" style="font-weight:600;">Block 1 · 9:00–10:00 AM</div>
+            </div>
+            <div class="pomo-body">
+              <div class="task-tile">
+                <div class="checkbox checked"></div>
+                <div class="text-sm flex-1" style="text-decoration:line-through;color:#aaa;">Finish Q2 roadmap deck</div>
+              </div>
+              <div class="task-tile">
+                <div class="checkbox checked"></div>
+                <div class="text-sm flex-1" style="text-decoration:line-through;color:#aaa;">Send standups</div>
+              </div>
+            </div>
+          </div>
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">2</div>
+              <div class="text-sm flex-1" style="font-weight:600;">Block 2 · 10:15–11:15 AM</div>
+            </div>
+            <div class="pomo-body">
+              <div class="task-tile">
+                <div class="checkbox checked"></div>
+                <div class="text-sm flex-1" style="text-decoration:line-through;color:#aaa;">Review PRs</div>
+              </div>
+              <div class="task-tile">
+                <div class="checkbox"></div>
+                <div class="text-sm flex-1">Update API docs</div>
+              </div>
+            </div>
+          </div>
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">3</div>
+              <div class="text-sm flex-1" style="font-weight:600;">Block 3 · 1:00–2:00 PM</div>
+              <div style="font-size:11px;color:#aaa;">Empty</div>
+            </div>
+          </div>
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">4</div>
+              <div class="text-sm flex-1" style="font-weight:600;">Block 4 · 2:15–3:15 PM</div>
+              <div style="font-size:11px;color:#aaa;">Empty</div>
+            </div>
+          </div>
+        </div>
+        <div class="fab">+</div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm Tab active -->
+    <div class="phone">
+      <div class="phone-label">Home — Farm Tab</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="screen-body">
+          <div class="card" style="margin-bottom:10px;">
+            <div class="row">
+              <div class="completion-circle">74%</div>
+              <div class="col flex-1">
+                <div class="text-md" style="font-weight:600;">Week Progress</div>
+                <div class="text-sm muted">14 / 19 tasks · Mon–Sun</div>
+              </div>
+              <span style="font-size:20px;color:#aaa;">›</span>
+            </div>
+          </div>
+          <div class="tab-bar" style="margin-bottom:10px;">
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Corp</div>
+            <div class="tab active" style="font-size:10px;padding:8px 2px;color:#2e7d32;border-bottom-color:#2e7d32;">Farm</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">App Dev</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Home &amp; Auto</div>
+          </div>
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">Goals</div>
+            <span class="link-btn">View All</span>
+          </div>
+          <div class="row" style="margin-bottom:12px;gap:6px;">
+            <div style="flex:1;background:#e8f5e9;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#2e7d32;text-transform:uppercase;margin-bottom:3px;">🌱 Farm</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Expand Garden</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">In Progress</div>
+            </div>
+            <div style="flex:1;background:#e8f5e9;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#2e7d32;text-transform:uppercase;margin-bottom:3px;">🌱 Farm</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Install Drip Lines</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">Not Started</div>
+            </div>
+            <div style="flex:1;background:#e8f5e9;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#2e7d32;text-transform:uppercase;margin-bottom:3px;">🌱 Farm</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Seed Fall Crops</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">Not Started</div>
+            </div>
+          </div>
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">Tasks</div>
+            <span class="link-btn">View All</span>
+          </div>
+          <div class="card card-sm">
+            <div class="task-tile">
+              <div class="checkbox checked"></div>
+              <div class="col flex-1">
+                <div class="text-md" style="text-decoration:line-through;color:#aaa;">Water seedlings</div>
+              </div>
+            </div>
+            <div class="task-tile">
+              <div class="checkbox"></div>
+              <div class="col flex-1"><div class="text-md">Turn compost pile</div></div>
+            </div>
+            <div class="task-tile">
+              <div class="checkbox"></div>
+              <div class="col flex-1"><div class="text-md">Check fence perimeter</div></div>
+            </div>
+            <div class="task-tile">
+              <div class="checkbox"></div>
+              <div class="col flex-1"><div class="text-md">Order drip tape</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab" style="background:#2e7d32;">+</div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App Dev Tab active -->
+    <div class="phone">
+      <div class="phone-label">Home — App Dev Tab</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="screen-body">
+          <div class="card" style="margin-bottom:10px;">
+            <div class="row">
+              <div class="completion-circle">74%</div>
+              <div class="col flex-1">
+                <div class="text-md" style="font-weight:600;">Week Progress</div>
+                <div class="text-sm muted">14 / 19 tasks · Mon–Sun</div>
+              </div>
+              <span style="font-size:20px;color:#aaa;">›</span>
+            </div>
+          </div>
+          <div class="tab-bar" style="margin-bottom:10px;">
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Corp</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Farm</div>
+            <div class="tab active" style="font-size:10px;padding:8px 2px;color:#e65100;border-bottom-color:#e65100;">App Dev</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Home &amp; Auto</div>
+          </div>
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">Goals</div>
+            <span class="link-btn">View All</span>
+          </div>
+          <div class="row" style="margin-bottom:12px;gap:6px;">
+            <div style="flex:1;background:#fff3e0;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#e65100;text-transform:uppercase;margin-bottom:3px;">💻 Dev</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Build SaaS MVP</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">In Progress</div>
+            </div>
+            <div style="flex:1;background:#fff3e0;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#e65100;text-transform:uppercase;margin-bottom:3px;">💻 Dev</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Publish Tech Blog</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">Completed</div>
+            </div>
+            <div style="flex:1;background:#fff3e0;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#e65100;text-transform:uppercase;margin-bottom:3px;">💻 Dev</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Launch Artemis</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">Not Started</div>
+            </div>
+          </div>
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">Tasks</div>
+            <span class="link-btn">View All</span>
+          </div>
+          <div class="card card-sm">
+            <div class="task-tile">
+              <div class="checkbox"></div>
+              <div class="col flex-1"><div class="text-md">Wire up auth screens</div></div>
+            </div>
+            <div class="task-tile">
+              <div class="checkbox"></div>
+              <div class="col flex-1"><div class="text-md">Design DB schema v2</div></div>
+            </div>
+            <div class="task-tile">
+              <div class="checkbox"></div>
+              <div class="col flex-1"><div class="text-md">Write unit tests for API</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab" style="background:#e65100;">+</div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Home & Auto Tab active -->
+    <div class="phone">
+      <div class="phone-label">Home — Home &amp; Auto Tab</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="screen-body">
+          <div class="card" style="margin-bottom:10px;">
+            <div class="row">
+              <div class="completion-circle">74%</div>
+              <div class="col flex-1">
+                <div class="text-md" style="font-weight:600;">Week Progress</div>
+                <div class="text-sm muted">14 / 19 tasks · Mon–Sun</div>
+              </div>
+              <span style="font-size:20px;color:#aaa;">›</span>
+            </div>
+          </div>
+          <div class="tab-bar" style="margin-bottom:10px;">
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Corp</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">Farm</div>
+            <div class="tab" style="font-size:10px;padding:8px 2px;">App Dev</div>
+            <div class="tab active" style="font-size:10px;padding:8px 2px;color:#6a1b9a;border-bottom-color:#6a1b9a;">Home &amp; Auto</div>
+          </div>
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">Goals</div>
+            <span class="link-btn">View All</span>
+          </div>
+          <div class="row" style="margin-bottom:12px;gap:6px;">
+            <div style="flex:1;background:#f3e5f5;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#6a1b9a;text-transform:uppercase;margin-bottom:3px;">🏠 H&amp;A</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Kitchen Reno</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">In Progress</div>
+            </div>
+            <div style="flex:1;background:#f3e5f5;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#6a1b9a;text-transform:uppercase;margin-bottom:3px;">🚗 H&amp;A</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Truck Upgrade</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">Not Started</div>
+            </div>
+            <div style="flex:1;background:#f3e5f5;border-radius:8px;padding:8px;min-width:0;">
+              <div style="font-size:9px;font-weight:700;color:#6a1b9a;text-transform:uppercase;margin-bottom:3px;">🏠 H&amp;A</div>
+              <div style="font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Backyard Path</div>
+              <div style="font-size:9px;color:#888;margin-top:2px;">Not Started</div>
+            </div>
+          </div>
+          <!-- Home tasks (from home-manager) -->
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">🏠 Home Tasks</div>
+            <span style="font-size:10px;color:#aaa;">home-manager</span>
+          </div>
+          <div class="card card-sm" style="margin-bottom:10px;">
+            <div class="task-tile">
+              <div class="priority-dot p-high"></div>
+              <div class="col flex-1">
+                <div class="text-md">Replace HVAC filter</div>
+                <div class="text-xs muted">Due 4/15</div>
+              </div>
+            </div>
+            <div class="task-tile">
+              <div class="priority-dot p-med"></div>
+              <div class="col flex-1">
+                <div class="text-md">Deep clean kitchen</div>
+                <div class="text-xs muted">Due 4/20</div>
+              </div>
+            </div>
+            <div class="task-tile">
+              <div class="priority-dot p-low"></div>
+              <div class="col flex-1">
+                <div class="text-md">Touch up trim paint</div>
+                <div class="text-xs muted">Due 5/1</div>
+              </div>
+            </div>
+          </div>
+          <!-- Vehicle tasks (from vehicle-manager) -->
+          <div class="section-row">
+            <div class="section-title" style="font-size:13px;">🚗 Vehicle Maintenance</div>
+            <span style="font-size:10px;color:#aaa;">vehicle-manager</span>
+          </div>
+          <div class="card card-sm">
+            <div class="task-tile">
+              <div class="priority-dot p-urgent"></div>
+              <div class="col flex-1">
+                <div class="text-md">F-150 — Oil change</div>
+                <div class="text-xs muted" style="color:#9c27b0;">Overdue</div>
+              </div>
+            </div>
+            <div class="task-tile">
+              <div class="priority-dot p-high"></div>
+              <div class="col flex-1">
+                <div class="text-md">Honda — Tire rotation</div>
+                <div class="text-xs muted">Due 4/18</div>
+              </div>
+            </div>
+            <div class="task-tile">
+              <div class="priority-dot p-med"></div>
+              <div class="col flex-1">
+                <div class="text-md">F-150 — Air filter</div>
+                <div class="text-xs muted">Due 4/28</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Goals -->
+    <div class="phone">
+      <div class="phone-label">Goals Tab</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="tab-bar" style="overflow-x:auto;">
+          <div class="tab active" style="font-size:11px;padding:10px 8px;flex-shrink:0;">All</div>
+          <div class="tab" style="font-size:11px;padding:10px 8px;flex-shrink:0;">Corp</div>
+          <div class="tab" style="font-size:11px;padding:10px 8px;flex-shrink:0;">Farm</div>
+          <div class="tab" style="font-size:11px;padding:10px 8px;flex-shrink:0;">App Dev</div>
+          <div class="tab" style="font-size:11px;padding:10px 8px;flex-shrink:0;">Home &amp; Auto</div>
+        </div>
+        <div class="screen-body">
+          <div style="height:8px;"></div>
+          <div class="goal-card">
+            <div class="goal-type-badge">Corporate</div>
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">Launch v2.0 API</div>
+              <span class="chip chip-blue">In Progress</span>
+            </div>
+            <div class="text-xs muted" style="margin-top:4px;">2 plans · Due 5/31/2026</div>
+          </div>
+          <div class="goal-card">
+            <div class="goal-type-badge">Corporate</div>
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">Hire Backend Engineer</div>
+              <span class="chip chip-amber">Not Started</span>
+            </div>
+            <div class="text-xs muted" style="margin-top:4px;">1 plan · Due 6/15/2026</div>
+          </div>
+          <div class="goal-card">
+            <div class="goal-type-badge farm">Farm</div>
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">Expand Garden</div>
+              <span class="chip chip-blue">In Progress</span>
+            </div>
+            <div class="text-xs muted" style="margin-top:4px;">1 plan · Due 6/1/2026</div>
+          </div>
+          <div class="goal-card">
+            <div class="goal-type-badge appdev">App Dev</div>
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">Build SaaS MVP</div>
+              <span class="chip chip-amber">Not Started</span>
+            </div>
+            <div class="text-xs muted" style="margin-top:4px;">0 plans · Due 7/1/2026</div>
+          </div>
+          <div class="goal-card">
+            <div class="goal-type-badge appdev">App Dev</div>
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">Publish Tech Blog</div>
+              <span class="chip chip-green">Completed</span>
+            </div>
+            <div class="text-xs muted" style="margin-top:4px;">3 plans · Completed</div>
+          </div>
+          <div class="goal-card">
+            <div class="goal-type-badge homeauto">Home &amp; Auto</div>
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">Kitchen Renovation</div>
+              <span class="chip chip-blue">In Progress</span>
+            </div>
+            <div class="text-xs muted" style="margin-top:4px;">2 plans · Due 8/1/2026</div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;background:#fafafa;border-top:1px solid #ececec;">
+          <div class="btn-filled">+ New Goal</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item active"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Week Planner -->
+    <div class="phone">
+      <div class="phone-label">Week Tab</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="screen-body">
+          <!-- Week navigator -->
+          <div class="row-sb" style="margin-bottom:12px;">
+            <span style="font-size:22px;color:#555;">‹</span>
+            <div class="text-md" style="font-weight:600;">4/7 – 4/13</div>
+            <span style="font-size:22px;color:#555;">›</span>
+          </div>
+          <!-- Weekly goals card -->
+          <div class="card" style="margin-bottom:14px;">
+            <div class="text-sm" style="font-weight:700;margin-bottom:8px;">Weekly Goals</div>
+            <div class="text-sm" style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px;">
+              <span>•</span><span>Finish API spec review</span>
+            </div>
+            <div class="text-sm" style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px;">
+              <span>•</span><span>Schedule interviews</span>
+            </div>
+            <div class="text-sm" style="display:flex;gap:6px;align-items:flex-start;">
+              <span>•</span><span>Ship blog post draft</span>
+            </div>
+          </div>
+          <!-- Days -->
+          <div class="week-day-row today">
+            <div class="day-label"><div class="dow">Sun</div><div class="dom">7</div></div>
+            <div class="day-progress">3/5 tasks completed</div>
+            <div class="mini-progress">60%</div>
+          </div>
+          <div class="week-day-row">
+            <div class="day-label"><div class="dow">Mon</div><div class="dom">8</div></div>
+            <div class="day-progress">2/2 tasks completed</div>
+            <div class="mini-progress">100%</div>
+          </div>
+          <div class="week-day-row">
+            <div class="day-label"><div class="dow">Tue</div><div class="dom">9</div></div>
+            <div class="day-progress">0/4 tasks completed</div>
+            <div class="mini-progress empty">0%</div>
+          </div>
+          <div class="week-day-row">
+            <div class="day-label"><div class="dow">Wed</div><div class="dom">10</div></div>
+            <div class="day-progress">No tasks</div>
+            <div class="mini-progress empty">–</div>
+          </div>
+          <div class="week-day-row">
+            <div class="day-label"><div class="dow">Thu</div><div class="dom">11</div></div>
+            <div class="day-progress">1/3 tasks completed</div>
+            <div class="mini-progress">33%</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item active"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Today -->
+    <div class="phone">
+      <div class="phone-label">Today Tab</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="screen-body">
+          <div class="row-sb" style="margin-bottom:12px;">
+            <div class="text-md" style="font-weight:600;">4/12/2026</div>
+            <div class="text-sm muted">2/5 completed</div>
+          </div>
+          <!-- Task list -->
+          <div class="task-tile">
+            <div class="checkbox checked"></div>
+            <div class="priority-dot p-urgent"></div>
+            <div class="col flex-1">
+              <div class="text-md" style="text-decoration:line-through;color:#aaa;">Morning standup</div>
+              <div class="text-xs muted">9:00 AM · 15 min</div>
+            </div>
+          </div>
+          <div class="task-tile">
+            <div class="checkbox checked"></div>
+            <div class="priority-dot p-high"></div>
+            <div class="col flex-1">
+              <div class="text-md" style="text-decoration:line-through;color:#aaa;">Code review</div>
+              <div class="text-xs muted">10:00 AM · 30 min</div>
+            </div>
+          </div>
+          <div class="task-tile">
+            <div class="checkbox"></div>
+            <div class="priority-dot p-high"></div>
+            <div class="col flex-1">
+              <div class="text-md">Finish Q2 roadmap deck</div>
+              <div class="text-xs muted">11:00 AM · 1 hour</div>
+            </div>
+          </div>
+          <div class="task-tile">
+            <div class="checkbox"></div>
+            <div class="priority-dot p-med"></div>
+            <div class="col flex-1">
+              <div class="text-md">Review pull requests</div>
+              <div class="text-xs muted">2:00 PM · 30 min</div>
+            </div>
+          </div>
+          <div class="task-tile">
+            <div class="checkbox"></div>
+            <div class="priority-dot p-low"></div>
+            <div class="col flex-1">
+              <div class="text-md">Update project wiki</div>
+              <div class="text-xs muted">No time set</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;background:#fafafa;border-top:1px solid #ececec;">
+          <div class="btn-filled">+ Add Task</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item active"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main tabs -->
+
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- SECTION: Day Planner (detail screen)    -->
+  <!-- ─────────────────────────────────────── -->
+  <div class="section-label">Day Planner Screen</div>
+  <div class="screens">
+
+    <div class="phone">
+      <div class="phone-label">Day Planner (Saturday 4/12)</div>
+      <div class="phone-shell" style="position:relative;">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title">Today</span>
+        </div>
+        <div class="screen-body" style="padding-bottom:80px;">
+          <!-- Header summary -->
+          <div class="row" style="margin-bottom:16px;">
+            <div class="completion-circle" style="width:44px;height:44px;font-size:11px;">40%</div>
+            <div class="col flex-1">
+              <div class="text-md" style="font-weight:600;">Saturday, 4/12/2026</div>
+              <div class="text-xs muted">2 of 5 tasks completed</div>
+            </div>
+          </div>
+
+          <!-- Pomodoro Block 1 -->
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">1</div>
+              <div class="flex-1 text-sm" style="font-weight:600;">Block 1</div>
+              <div class="text-xs muted">1/2</div>
+              <span style="font-size:16px;color:#1565C0;">+</span>
+            </div>
+            <div class="pomo-body">
+              <div class="task-tile">
+                <div class="checkbox checked"></div>
+                <div class="priority-dot p-urgent"></div>
+                <div class="col flex-1">
+                  <div class="text-sm" style="text-decoration:line-through;color:#aaa;">Morning standup</div>
+                  <div class="text-xs muted">9:00 AM · 15 min</div>
+                </div>
+              </div>
+              <div class="task-tile">
+                <div class="checkbox"></div>
+                <div class="priority-dot p-high"></div>
+                <div class="col flex-1">
+                  <div class="text-sm">Finish Q2 roadmap deck</div>
+                  <div class="text-xs muted">11:00 AM · 1 hour</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pomodoro Block 2 -->
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">2</div>
+              <div class="flex-1 text-sm" style="font-weight:600;">Block 2</div>
+              <div class="text-xs muted">1/1</div>
+              <span style="font-size:16px;color:#1565C0;">+</span>
+            </div>
+            <div class="pomo-body">
+              <div class="task-tile">
+                <div class="checkbox checked"></div>
+                <div class="priority-dot p-high"></div>
+                <div class="col flex-1">
+                  <div class="text-sm" style="text-decoration:line-through;color:#aaa;">Code review</div>
+                  <div class="text-xs muted">10:00 AM · 30 min</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pomodoro Block 3 -->
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">3</div>
+              <div class="flex-1 text-sm" style="font-weight:600;">Block 3</div>
+              <span style="font-size:16px;color:#1565C0;">+</span>
+            </div>
+            <div class="pomo-body">
+              <div class="text-xs muted">No tasks — tap + to add</div>
+            </div>
+          </div>
+
+          <!-- Pomodoro Block 4 -->
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <div class="pomo-number">4</div>
+              <div class="flex-1 text-sm" style="font-weight:600;">Block 4</div>
+              <span style="font-size:16px;color:#1565C0;">+</span>
+            </div>
+            <div class="pomo-body">
+              <div class="text-xs muted">No tasks — tap + to add</div>
+            </div>
+          </div>
+
+          <!-- Unassigned block -->
+          <div class="pomo-block">
+            <div class="pomo-header">
+              <span style="font-size:18px;color:#aaa;">📥</span>
+              <div class="flex-1 text-sm" style="font-weight:600;">Unassigned</div>
+              <div class="text-xs muted">0/2</div>
+            </div>
+            <div class="pomo-body">
+              <div class="task-tile">
+                <div class="checkbox"></div>
+                <div class="priority-dot p-med"></div>
+                <div class="col flex-1">
+                  <div class="text-sm">Review pull requests</div>
+                  <div class="text-xs muted">2:00 PM · 30 min</div>
+                </div>
+              </div>
+              <div class="task-tile">
+                <div class="checkbox"></div>
+                <div class="priority-dot p-low"></div>
+                <div class="col flex-1">
+                  <div class="text-sm">Update project wiki</div>
+                  <div class="text-xs muted">No time set</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="card">
+            <div class="text-sm" style="font-weight:700;margin-bottom:8px;">Notes</div>
+            <div class="notes-field">Focus on the roadmap before noon. Block Slack notifications.</div>
+          </div>
+        </div>
+        <!-- FAB -->
+        <div class="fab">+</div>
+      </div>
+    </div>
+
+  </div><!-- /day planner -->
+
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- SECTION: Goal screens                   -->
+  <!-- ─────────────────────────────────────── -->
+  <div class="section-label">Goal Screens</div>
+  <div class="screens">
+
+    <!-- Goal Detail -->
+    <div class="phone">
+      <div class="phone-label">Goal Detail</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title flex-1">Goal Details</span>
+          <div class="actions"><span>✏️</span><span>🗑️</span></div>
+        </div>
+        <div class="screen-body">
+          <!-- Info card -->
+          <div class="card">
+            <div class="row-sb" style="margin-bottom:12px;">
+              <div class="row" style="gap:6px;">
+                <span style="color:#1565C0;">🏢</span>
+                <span class="text-sm primary" style="font-weight:600;">Corporate</span>
+              </div>
+              <span class="chip chip-blue">In Progress</span>
+            </div>
+            <div class="text-xl" style="margin-bottom:6px;">Launch v2.0 API</div>
+            <div class="text-sm muted" style="margin-bottom:14px;">
+              Complete the API redesign, write migration docs, and coordinate with the mobile team for the May release.
+            </div>
+            <div class="row text-xs muted" style="margin-bottom:4px;">
+              <span>📅</span><span>Target: 5/31/2026</span>
+            </div>
+            <div class="row text-xs muted">
+              <span>🕐</span><span>Created: 3/1/2026</span>
+            </div>
+          </div>
+
+          <!-- Status picker -->
+          <div class="text-md" style="font-weight:600;margin-bottom:8px;">Status</div>
+          <div class="choice-chips">
+            <div class="choice-chip">Not Started</div>
+            <div class="choice-chip selected">In Progress</div>
+            <div class="choice-chip">Completed</div>
+            <div class="choice-chip">Abandoned</div>
+          </div>
+
+          <!-- Plans -->
+          <div class="row-sb" style="margin-bottom:8px;">
+            <div class="row" style="gap:4px;">
+              <div class="text-md" style="font-weight:600;">Plans</div>
+              <span style="font-size:16px;color:#1565C0;">›</span>
+            </div>
+            <span class="link-btn">+ Add Plan</span>
+          </div>
+          <div class="card card-sm" style="margin-bottom:8px;">
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">API Schema Design</div>
+              <span class="chip chip-green">Active</span>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:70%;"></div></div>
+            <div class="text-xs muted" style="margin-top:4px;">7/10 steps · 4/15 – 5/1</div>
+          </div>
+          <div class="card card-sm">
+            <div class="row-sb">
+              <div class="text-md" style="font-weight:600;">Migration Docs</div>
+              <span class="chip chip-grey">Draft</span>
+            </div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:10%;"></div></div>
+            <div class="text-xs muted" style="margin-top:4px;">1/8 steps · 5/1 – 5/25</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goal Form -->
+    <div class="phone">
+      <div class="phone-label">Goal Form (New / Edit)</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title">New Goal</span>
+        </div>
+        <div class="screen-body">
+          <div class="field">
+            <label>Title *</label>
+            <div class="field-input">Launch v2.0 API</div>
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <div class="field-input multiline">Complete the API redesign...</div>
+          </div>
+          <div class="field">
+            <label>Type</label>
+            <div class="segmented-btn">
+              <div class="seg selected">Corporate</div>
+              <div class="seg">Entrepreneurial</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <div class="choice-chips" style="margin-top:4px;">
+              <div class="choice-chip selected">Not Started</div>
+              <div class="choice-chip">In Progress</div>
+              <div class="choice-chip">Completed</div>
+              <div class="choice-chip">Abandoned</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Target Date (optional)</label>
+            <div class="field-input">5/31/2026</div>
+          </div>
+          <div class="btn-filled">Create Goal</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /goal screens -->
+
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- SECTION: Plan screens                   -->
+  <!-- ─────────────────────────────────────── -->
+  <div class="section-label">Plan Screens</div>
+  <div class="screens">
+
+    <!-- Plan Detail -->
+    <div class="phone">
+      <div class="phone-label">Plan Detail</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title flex-1">Plan Details</span>
+          <div class="actions"><span>✏️</span><span>🗑️</span></div>
+        </div>
+        <div class="screen-body">
+          <!-- Plan info card -->
+          <div class="card">
+            <div class="row-sb" style="margin-bottom:10px;">
+              <div class="text-xl flex-1">API Schema Design</div>
+              <span class="chip chip-green">Active</span>
+            </div>
+            <div class="text-sm muted" style="margin-bottom:12px;">
+              Design OpenAPI 3.1 schema for all v2 endpoints including auth, resources, and webhooks.
+            </div>
+            <div class="row text-xs muted" style="gap:16px;">
+              <span>▶ Start: 4/15/2026</span>
+              <span>■ End: 5/1/2026</span>
+            </div>
+          </div>
+
+          <!-- Status picker -->
+          <div class="text-md" style="font-weight:600;margin-bottom:8px;">Status</div>
+          <div class="choice-chips">
+            <div class="choice-chip">Draft</div>
+            <div class="choice-chip selected">Active</div>
+            <div class="choice-chip">Completed</div>
+            <div class="choice-chip">Cancelled</div>
+          </div>
+
+          <!-- Steps -->
+          <div class="row-sb" style="margin-bottom:8px;">
+            <div class="text-md" style="font-weight:600;">Steps</div>
+            <span class="link-btn">+ Add Step</span>
+          </div>
+          <div class="plan-step">
+            <div class="step-num">1</div>
+            <div class="text-sm flex-1">Define resource endpoints</div>
+            <span style="font-size:16px;color:#bbb;">🗑</span>
+          </div>
+          <div class="plan-step">
+            <div class="step-num">2</div>
+            <div class="text-sm flex-1">Write auth schema</div>
+            <span style="font-size:16px;color:#bbb;">🗑</span>
+          </div>
+          <div class="plan-step">
+            <div class="step-num">3</div>
+            <div class="text-sm flex-1">Add webhook spec</div>
+            <span style="font-size:16px;color:#bbb;">🗑</span>
+          </div>
+          <div class="text-xs muted" style="margin-bottom:14px;padding-left:4px;">
+            ⠿ Drag to reorder
+          </div>
+
+          <!-- Linked tasks -->
+          <div class="row-sb" style="margin-bottom:8px;">
+            <div class="text-md" style="font-weight:600;">Linked Tasks (2)</div>
+            <span class="link-btn">+ Add Task</span>
+          </div>
+          <div class="task-tile">
+            <div class="checkbox checked"></div>
+            <div class="priority-dot p-high"></div>
+            <div class="col flex-1">
+              <div class="text-sm" style="text-decoration:line-through;color:#aaa;">Draft endpoint list</div>
+              <div class="text-xs muted">4/10 · 30 min</div>
+            </div>
+          </div>
+          <div class="task-tile">
+            <div class="checkbox"></div>
+            <div class="priority-dot p-med"></div>
+            <div class="col flex-1">
+              <div class="text-sm">Write OpenAPI YAML</div>
+              <div class="text-xs muted">4/12 · 1 hour</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Form -->
+    <div class="phone">
+      <div class="phone-label">Plan Form (New / Edit)</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title">New Plan</span>
+        </div>
+        <div class="screen-body">
+          <div class="field">
+            <label>Title *</label>
+            <div class="field-input">API Schema Design</div>
+          </div>
+          <div class="field">
+            <label>Description</label>
+            <div class="field-input multiline">Design OpenAPI 3.1 schema...</div>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <div class="choice-chips" style="margin-top:4px;">
+              <div class="choice-chip selected">Draft</div>
+              <div class="choice-chip">Active</div>
+              <div class="choice-chip">Completed</div>
+              <div class="choice-chip">Cancelled</div>
+            </div>
+          </div>
+          <div class="row" style="gap:10px;margin-bottom:14px;">
+            <div class="field flex-1" style="margin-bottom:0;">
+              <label>Start Date</label>
+              <div class="field-input">4/15/2026</div>
+            </div>
+            <div class="field flex-1" style="margin-bottom:0;">
+              <label>End Date</label>
+              <div class="field-input">5/1/2026</div>
+            </div>
+          </div>
+          <div class="btn-filled">Create Plan</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /plan screens -->
+
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- SECTION: Task Form                      -->
+  <!-- ─────────────────────────────────────── -->
+  <div class="section-label">Task Form Screen</div>
+  <div class="screens">
+
+    <div class="phone">
+      <div class="phone-label">Task Form (New / Edit)</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar">
+          <span class="back">←</span>
+          <span class="title">New Task</span>
+        </div>
+        <div class="screen-body">
+          <div class="field">
+            <label>Title *</label>
+            <div class="field-input">Finish Q2 roadmap deck</div>
+          </div>
+          <div class="field">
+            <label>Description (optional)</label>
+            <div class="field-input multiline">Include Q3 preview slides...</div>
+          </div>
+
+          <!-- Priority -->
+          <div class="field">
+            <label>Priority</label>
+            <div class="segmented-btn" style="margin-top:4px;">
+              <div class="seg">Low</div>
+              <div class="seg">Medium</div>
+              <div class="seg selected">High</div>
+              <div class="seg">Urgent</div>
+            </div>
+          </div>
+
+          <!-- Schedule -->
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;">Schedule</div>
+          <div class="row" style="gap:10px;margin-bottom:14px;">
+            <div class="card flex-1" style="margin:0;padding:10px;">
+              <div class="text-xs muted" style="margin-bottom:4px;">Time</div>
+              <div class="row text-sm" style="gap:6px;">
+                <span>🕙</span><span>11:00 AM</span>
+              </div>
+            </div>
+            <div class="card flex-1" style="margin:0;padding:10px;">
+              <div class="text-xs muted" style="margin-bottom:4px;">Duration</div>
+              <div class="dropdown" style="padding:4px 8px;font-size:12px;">
+                1 hour <span>▾</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pomodoro block -->
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;">Pomodoro Block (optional)</div>
+          <div class="choice-chips">
+            <div class="choice-chip">None</div>
+            <div class="choice-chip selected">Block 1</div>
+            <div class="choice-chip">Block 2</div>
+            <div class="choice-chip">Block 3</div>
+            <div class="choice-chip">Block 4</div>
+          </div>
+
+          <!-- Link to plan -->
+          <div class="field">
+            <label>Link to Plan (optional)</label>
+            <div class="dropdown">
+              API Schema Design <span>▾</span>
+            </div>
+          </div>
+
+          <div class="btn-filled">Create Task</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /task form -->
+
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- SECTION: Empty states                   -->
+  <!-- ─────────────────────────────────────── -->
+  <div class="section-label">Empty States</div>
+  <div class="screens">
+
+    <div class="phone">
+      <div class="phone-label">No Goals Yet</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="tab-bar">
+          <div class="tab active">All</div>
+          <div class="tab">Corporate</div>
+          <div class="tab">Entrepreneurial</div>
+        </div>
+        <div class="screen-body" style="display:flex;align-items:center;justify-content:center;">
+          <div class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <div class="text-md" style="color:#aaa;font-weight:600;">No goals yet</div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;background:#fafafa;border-top:1px solid #ececec;">
+          <div class="btn-filled">+ New Goal</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item active"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-label">No Tasks Today</div>
+      <div class="phone-shell">
+        <div class="status-bar"><span>9:41</span><span>▐▌▌ ⬡</span></div>
+        <div class="app-bar"><span class="title">Work Planner</span></div>
+        <div class="screen-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;">
+          <div class="empty-state">
+            <div class="empty-icon">✅</div>
+            <div class="text-md" style="color:#aaa;font-weight:600;">All tasks completed!</div>
+            <div class="text-sm muted">Great work today.</div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;background:#fafafa;border-top:1px solid #ececec;">
+          <div class="btn-filled">+ Add Task</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+          <div class="nav-item"><span class="nav-icon">🎯</span><span class="nav-label">Goals</span></div>
+          <div class="nav-item"><span class="nav-icon">📅</span><span class="nav-label">Week</span></div>
+          <div class="nav-item"><span class="nav-icon">📆</span><span class="nav-label">Today</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /empty states -->
+
+</body>
+</html>

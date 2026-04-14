@@ -116,8 +116,14 @@ class AuthService {
     }
 
     final body = jsonDecode(resp.body) as Map<String, dynamic>;
-    await _storage.write(key: _accessTokenKey, value: body['access_token'] as String);
-    await _storage.write(key: _refreshTokenKey, value: body['refresh_token'] as String);
+    await _storage.write(
+      key: _accessTokenKey,
+      value: body['access_token'] as String,
+    );
+    await _storage.write(
+      key: _refreshTokenKey,
+      value: body['refresh_token'] as String,
+    );
   }
 
   Future<String?> getAccessToken() => _storage.read(key: _accessTokenKey);
@@ -135,7 +141,10 @@ class AuthService {
   // ---------------------------------------------------------------------------
 
   Future<Map<String, dynamic>> getCurrentUser() async {
-    final resp = await authenticatedRequest(method: 'GET', endpoint: '/auth/me');
+    final resp = await authenticatedRequest(
+      method: 'GET',
+      endpoint: '/auth/me',
+    );
     if (resp.statusCode != 200) {
       throw AuthException('Failed to fetch user profile');
     }
@@ -163,14 +172,24 @@ class AuthService {
       ...?extraHeaders,
     };
 
-    http.Response resp = await _send(method: method, uri: ApiConfig.uri(endpoint), headers: headers, body: body);
+    http.Response resp = await _send(
+      method: method,
+      uri: ApiConfig.uri(endpoint),
+      headers: headers,
+      body: body,
+    );
 
     if (resp.statusCode == 401) {
       await refreshAccessToken();
       final newToken = await getAccessToken();
       if (newToken == null) return resp;
       headers['Authorization'] = 'Bearer $newToken';
-      resp = await _send(method: method, uri: ApiConfig.uri(endpoint), headers: headers, body: body);
+      resp = await _send(
+        method: method,
+        uri: ApiConfig.uri(endpoint),
+        headers: headers,
+        body: body,
+      );
     }
 
     return resp;
@@ -187,9 +206,13 @@ class AuthService {
       case 'GET':
         return http.get(uri, headers: headers).timeout(_timeout);
       case 'POST':
-        return http.post(uri, headers: headers, body: encoded).timeout(_timeout);
+        return http
+            .post(uri, headers: headers, body: encoded)
+            .timeout(_timeout);
       case 'PATCH':
-        return http.patch(uri, headers: headers, body: encoded).timeout(_timeout);
+        return http
+            .patch(uri, headers: headers, body: encoded)
+            .timeout(_timeout);
       case 'PUT':
         return http.put(uri, headers: headers, body: encoded).timeout(_timeout);
       case 'DELETE':

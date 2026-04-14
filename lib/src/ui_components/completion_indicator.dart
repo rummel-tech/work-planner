@@ -21,7 +21,8 @@ class CompletionIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bgColor = backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
+    final bgColor =
+        backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
     final fgColor = progressColor ?? theme.colorScheme.primary;
 
     return SizedBox(

@@ -35,23 +35,25 @@ class Plan {
     List<String>? steps,
     PlanStatus status = PlanStatus.draft,
   }) : this._(
-          id: id ?? const Uuid().v4(),
-          title: title,
-          description: description,
-          goalId: goalId,
-          createdAt: createdAt ?? DateTime.now(),
-          startDate: startDate,
-          endDate: endDate,
-          steps: steps ?? const [],
-          status: status,
-        );
+         id: id ?? const Uuid().v4(),
+         title: title,
+         description: description,
+         goalId: goalId,
+         createdAt: createdAt ?? DateTime.now(),
+         startDate: startDate,
+         endDate: endDate,
+         steps: steps ?? const [],
+         status: status,
+       );
 
   Plan copyWith({
     String? title,
     String? description,
     String? goalId,
     DateTime? startDate,
+    bool clearStartDate = false,
     DateTime? endDate,
+    bool clearEndDate = false,
     List<String>? steps,
     PlanStatus? status,
   }) {
@@ -61,8 +63,8 @@ class Plan {
       description: description ?? this.description,
       goalId: goalId ?? this.goalId,
       createdAt: createdAt,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
+      startDate: clearStartDate ? null : (startDate ?? this.startDate),
+      endDate: clearEndDate ? null : (endDate ?? this.endDate),
       steps: steps ?? List<String>.from(this.steps),
       status: status ?? this.status,
     );
@@ -92,9 +94,4 @@ class Plan {
 }
 
 /// Status of a plan
-enum PlanStatus {
-  draft,
-  active,
-  completed,
-  cancelled,
-}
+enum PlanStatus { draft, active, completed, cancelled }

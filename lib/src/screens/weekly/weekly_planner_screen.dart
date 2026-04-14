@@ -41,13 +41,17 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   void _initWeekStart() {
     final date = widget.initialWeekStart ?? DateTime.now();
     final weekday = date.weekday;
-    _currentWeekStart = DateTime(date.year, date.month, date.day)
-        .subtract(Duration(days: weekday - 1));
+    _currentWeekStart = DateTime(
+      date.year,
+      date.month,
+      date.day,
+    ).subtract(Duration(days: weekday - 1));
   }
 
   Future<void> _loadWeekPlanner() async {
-    final planner =
-        await _plannerRepository.getOrCreateWeekPlanner(_currentWeekStart);
+    final planner = await _plannerRepository.getOrCreateWeekPlanner(
+      _currentWeekStart,
+    );
     final dayPlanners = await _plannerRepository.getDayPlannersForWeek(planner);
     final stats = await _plannerRepository.getWeekStats(planner);
 
@@ -77,8 +81,11 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
     final now = DateTime.now();
     final weekday = now.weekday;
     setState(() {
-      _currentWeekStart = DateTime(now.year, now.month, now.day)
-          .subtract(Duration(days: weekday - 1));
+      _currentWeekStart = DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: weekday - 1));
     });
     _loadWeekPlanner();
   }
@@ -115,7 +122,10 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
 
     if (goal != null && goal.isNotEmpty && _weekPlanner != null) {
       final updatedGoals = [..._weekPlanner!.weeklyGoals, goal];
-      await _plannerRepository.updateWeekPlannerGoals(_currentWeekStart, updatedGoals);
+      await _plannerRepository.updateWeekPlannerGoals(
+        _currentWeekStart,
+        updatedGoals,
+      );
       _loadWeekPlanner();
     }
   }
@@ -123,14 +133,22 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   Future<void> _removeWeeklyGoal(String goal) async {
     if (_weekPlanner == null) return;
 
-    final updatedGoals = _weekPlanner!.weeklyGoals.where((g) => g != goal).toList();
-    await _plannerRepository.updateWeekPlannerGoals(_currentWeekStart, updatedGoals);
+    final updatedGoals = _weekPlanner!.weeklyGoals
+        .where((g) => g != goal)
+        .toList();
+    await _plannerRepository.updateWeekPlannerGoals(
+      _currentWeekStart,
+      updatedGoals,
+    );
     _loadWeekPlanner();
   }
 
   Future<void> _saveNotes() async {
     if (_weekPlanner == null) return;
-    await _plannerRepository.updateWeekPlannerNotes(_currentWeekStart, _notesController.text);
+    await _plannerRepository.updateWeekPlannerNotes(
+      _currentWeekStart,
+      _notesController.text,
+    );
   }
 
   String _formatWeekRange() {
@@ -141,8 +159,11 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   bool _isCurrentWeek() {
     final now = DateTime.now();
     final weekday = now.weekday;
-    final currentWeekStart = DateTime(now.year, now.month, now.day)
-        .subtract(Duration(days: weekday - 1));
+    final currentWeekStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(Duration(days: weekday - 1));
     return _currentWeekStart.isAtSameMomentAs(currentWeekStart);
   }
 
@@ -155,10 +176,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
         title: const Text('Weekly Planner'),
         actions: [
           if (!_isCurrentWeek())
-            TextButton(
-              onPressed: _goToToday,
-              child: const Text('Today'),
-            ),
+            TextButton(onPressed: _goToToday, child: const Text('Today')),
         ],
       ),
       body: RefreshIndicator(
@@ -271,7 +289,10 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
                             (goal) => ListTile(
                               dense: true,
                               contentPadding: EdgeInsets.zero,
-                              leading: const Icon(Icons.flag_outlined, size: 20),
+                              leading: const Icon(
+                                Icons.flag_outlined,
+                                size: 20,
+                              ),
                               title: Text(goal),
                               trailing: IconButton(
                                 icon: const Icon(Icons.close, size: 18),
@@ -321,7 +342,8 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
                     final completedCount =
                         dayPlanner?.completedTasks.length ?? 0;
                     final now = DateTime.now();
-                    final isToday = date.day == now.day &&
+                    final isToday =
+                        date.day == now.day &&
                         date.month == now.month &&
                         date.year == now.year;
 
@@ -341,7 +363,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
                                 'Thu',
                                 'Fri',
                                 'Sat',
-                                'Sun'
+                                'Sun',
                               ][index],
                               style: theme.textTheme.labelMedium?.copyWith(
                                 fontWeight: isToday ? FontWeight.bold : null,

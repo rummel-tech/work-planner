@@ -90,8 +90,12 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     switch (_goal.type) {
       case GoalType.corporate:
         return Icons.business;
-      case GoalType.entrepreneurial:
-        return Icons.lightbulb_outline;
+      case GoalType.farm:
+        return Icons.agriculture;
+      case GoalType.appDevelopment:
+        return Icons.code;
+      case GoalType.homeAuto:
+        return Icons.home;
     }
   }
 
@@ -99,8 +103,12 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     switch (_goal.type) {
       case GoalType.corporate:
         return 'Corporate';
-      case GoalType.entrepreneurial:
-        return 'Entrepreneurial';
+      case GoalType.farm:
+        return 'Farm';
+      case GoalType.appDevelopment:
+        return 'App Dev';
+      case GoalType.homeAuto:
+        return 'Home & Auto';
     }
   }
 
@@ -123,10 +131,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
               _refreshGoal();
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: _deleteGoal,
-          ),
+          IconButton(icon: const Icon(Icons.delete), onPressed: _deleteGoal),
         ],
       ),
       body: RefreshIndicator(
@@ -213,10 +218,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Status',
-                style: theme.textTheme.titleMedium,
-              ),
+              Text('Status', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -247,7 +249,11 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                       children: [
                         Text('Plans', style: theme.textTheme.titleMedium),
                         const SizedBox(width: 4),
-                        Icon(Icons.chevron_right, size: 18, color: theme.colorScheme.primary),
+                        Icon(
+                          Icons.chevron_right,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
                       ],
                     ),
                   ),
@@ -291,17 +297,19 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                   ),
                 )
               else
-                ..._plans.map((plan) => PlanCard(
-                      plan: plan,
-                      onTap: () async {
-                        await Navigator.pushNamed(
-                          context,
-                          AppRouter.planDetail,
-                          arguments: plan,
-                        );
-                        _loadPlans();
-                      },
-                    )),
+                ..._plans.map(
+                  (plan) => PlanCard(
+                    plan: plan,
+                    onTap: () async {
+                      await Navigator.pushNamed(
+                        context,
+                        AppRouter.planDetail,
+                        arguments: plan,
+                      );
+                      _loadPlans();
+                    },
+                  ),
+                ),
             ],
           ),
         ),

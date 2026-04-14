@@ -1,5 +1,9 @@
 import 'package:uuid/uuid.dart';
 
+/// Which work context a task belongs to.
+/// null is treated as [TaskCategory.corporate] for backward compatibility.
+enum TaskCategory { corporate, farm, appDevelopment }
+
 /// Represents a task in a planner
 class Task {
   final String id;
@@ -10,7 +14,8 @@ class Task {
   final TaskPriority priority;
   final bool completed;
   final String? planId;
-  final int? pomodoroBlock; // 1–4, null = unassigned
+  final int? pomodoroBlock; // 1–4, only meaningful for corporate tasks
+  final TaskCategory? taskCategory; // null == corporate (backward compat)
 
   const Task._({
     required this.id,
@@ -22,6 +27,7 @@ class Task {
     required this.completed,
     this.planId,
     this.pomodoroBlock,
+    this.taskCategory,
   });
 
   Task.create({
@@ -34,45 +40,65 @@ class Task {
     bool completed = false,
     String? planId,
     int? pomodoroBlock,
+    TaskCategory? taskCategory,
   }) : this._(
-          id: id ?? const Uuid().v4(),
-          title: title,
-          description: description,
-          scheduledTime: scheduledTime,
-          durationMinutes: durationMinutes,
-          priority: priority,
-          completed: completed,
-          planId: planId,
-          pomodoroBlock: pomodoroBlock,
-        );
+         id: id ?? const Uuid().v4(),
+         title: title,
+         description: description,
+         scheduledTime: scheduledTime,
+         durationMinutes: durationMinutes,
+         priority: priority,
+         completed: completed,
+         planId: planId,
+         pomodoroBlock: pomodoroBlock,
+         taskCategory: taskCategory,
+       );
 
   Task copyWith({
     String? title,
     String? description,
+    bool clearDescription = false,
     DateTime? scheduledTime,
+    bool clearScheduledTime = false,
     int? durationMinutes,
+    bool clearDurationMinutes = false,
     TaskPriority? priority,
     bool? completed,
     String? planId,
+    bool clearPlanId = false,
     int? pomodoroBlock,
     bool clearPomodoroBlock = false,
+    TaskCategory? taskCategory,
+    bool clearTaskCategory = false,
   }) {
     return Task._(
       id: id,
       title: title ?? this.title,
-      description: description ?? this.description,
-      scheduledTime: scheduledTime ?? this.scheduledTime,
-      durationMinutes: durationMinutes ?? this.durationMinutes,
+      description: clearDescription ? null : (description ?? this.description),
+      scheduledTime: clearScheduledTime
+          ? null
+          : (scheduledTime ?? this.scheduledTime),
+      durationMinutes: clearDurationMinutes
+          ? null
+          : (durationMinutes ?? this.durationMinutes),
       priority: priority ?? this.priority,
       completed: completed ?? this.completed,
-      planId: planId ?? this.planId,
-      pomodoroBlock: clearPomodoroBlock ? null : (pomodoroBlock ?? this.pomodoroBlock),
+      planId: clearPlanId ? null : (planId ?? this.planId),
+      pomodoroBlock: clearPomodoroBlock
+          ? null
+          : (pomodoroBlock ?? this.pomodoroBlock),
+      taskCategory: clearTaskCategory
+          ? null
+          : (taskCategory ?? this.taskCategory),
     );
   }
 
   Task toggleCompleted() {
     return copyWith(completed: !completed);
   }
+
+  /// Effective category — null stored as corporate for backward compat.
+  TaskCategory get effectiveCategory => taskCategory ?? TaskCategory.corporate;
 
   @override
   String toString() {
@@ -90,12 +116,7 @@ class Task {
 }
 
 /// Priority level for a task
-enum TaskPriority {
-  low,
-  medium,
-  high,
-  urgent,
-}
+enum TaskPriority { low, medium, high, urgent }
 
 /// Represents a daily planner
 class DayPlanner {
@@ -117,17 +138,13 @@ class DayPlanner {
     List<Task>? tasks,
     String? notes,
   }) : this._(
-          id: id ?? const Uuid().v4(),
-          date: DateTime(date.year, date.month, date.day),
-          tasks: tasks ?? const [],
-          notes: notes,
-        );
+         id: id ?? const Uuid().v4(),
+         date: DateTime(date.year, date.month, date.day),
+         tasks: tasks ?? const [],
+         notes: notes,
+       );
 
-  DayPlanner copyWith({
-    DateTime? date,
-    List<Task>? tasks,
-    String? notes,
-  }) {
+  DayPlanner copyWith({DateTime? date, List<Task>? tasks, String? notes}) {
     return DayPlanner._(
       id: id,
       date: date ?? this.date,
@@ -146,7 +163,9 @@ class DayPlanner {
 
   DayPlanner updateTask(Task updatedTask) {
     return copyWith(
-      tasks: tasks.map((t) => t.id == updatedTask.id ? updatedTask : t).toList(),
+      tasks: tasks
+          .map((t) => t.id == updatedTask.id ? updatedTask : t)
+          .toList(),
     );
   }
 

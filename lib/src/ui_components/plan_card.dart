@@ -7,11 +7,7 @@ class PlanCard extends StatelessWidget {
   final Plan plan;
   final VoidCallback? onTap;
 
-  const PlanCard({
-    super.key,
-    required this.plan,
-    this.onTap,
-  });
+  const PlanCard({super.key, required this.plan, this.onTap});
 
   String _formatDateRange() {
     if (plan.startDate == null && plan.endDate == null) {

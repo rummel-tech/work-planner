@@ -9,15 +9,14 @@ void main() {
     String goalId = 'goal-1',
     PlanStatus status = PlanStatus.draft,
     List<String>? steps,
-  }) =>
-      Plan.create(
-        id: id,
-        title: title,
-        description: description,
-        goalId: goalId,
-        status: status,
-        steps: steps,
-      );
+  }) => Plan.create(
+    id: id,
+    title: title,
+    description: description,
+    goalId: goalId,
+    status: status,
+    steps: steps,
+  );
 
   group('Plan', () {
     group('Plan.create', () {
@@ -39,8 +38,12 @@ void main() {
         final start = DateTime(2025, 1, 1);
         final end = DateTime(2025, 6, 30);
         final p = Plan.create(
-          title: 'T', description: 'D', goalId: 'g',
-          startDate: start, endDate: end);
+          title: 'T',
+          description: 'D',
+          goalId: 'g',
+          startDate: start,
+          endDate: end,
+        );
         expect(p.startDate, equals(start));
         expect(p.endDate, equals(end));
       });
@@ -58,7 +61,8 @@ void main() {
       test('updates status', () {
         expect(
           makePlan().copyWith(status: PlanStatus.active).status,
-          equals(PlanStatus.active));
+          equals(PlanStatus.active),
+        );
       });
 
       test('updates steps defensively (new list)', () {
@@ -103,8 +107,18 @@ void main() {
 
     group('equality', () {
       test('same id means equal', () {
-        final a = Plan.create(id: 'same', title: 'A', description: 'D', goalId: 'g');
-        final b = Plan.create(id: 'same', title: 'B', description: 'X', goalId: 'g2');
+        final a = Plan.create(
+          id: 'same',
+          title: 'A',
+          description: 'D',
+          goalId: 'g',
+        );
+        final b = Plan.create(
+          id: 'same',
+          title: 'B',
+          description: 'X',
+          goalId: 'g2',
+        );
         expect(a, equals(b));
       });
 
@@ -117,12 +131,15 @@ void main() {
 
     group('PlanStatus enum', () {
       test('all cases exist', () {
-        expect(PlanStatus.values, containsAll([
-          PlanStatus.draft,
-          PlanStatus.active,
-          PlanStatus.completed,
-          PlanStatus.cancelled,
-        ]));
+        expect(
+          PlanStatus.values,
+          containsAll([
+            PlanStatus.draft,
+            PlanStatus.active,
+            PlanStatus.completed,
+            PlanStatus.cancelled,
+          ]),
+        );
       });
     });
   });

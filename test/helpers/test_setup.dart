@@ -16,12 +16,14 @@ FakeAuthService fakeAuth = FakeAuthService(authenticated: true);
 FakeGoalRepository fakeGoals = FakeGoalRepository();
 FakePlanRepository fakePlans = FakePlanRepository();
 FakePlannerRepository fakePlanners = FakePlannerRepository();
+FakeExternalTaskService fakeExternalTasks = FakeExternalTaskService();
 
 void initTestServices({bool authenticated = true}) {
   fakeAuth = FakeAuthService(authenticated: authenticated);
   fakeGoals = FakeGoalRepository();
   fakePlans = FakePlanRepository();
   fakePlanners = FakePlannerRepository();
+  fakeExternalTasks = FakeExternalTaskService();
 
   ServiceLocator.init(
     authService: fakeAuth,
@@ -29,6 +31,7 @@ void initTestServices({bool authenticated = true}) {
     goalRepo: fakeGoals,
     planRepo: fakePlans,
     plannerRepo: fakePlanners,
+    externalTaskService: fakeExternalTasks,
   );
 }
 
@@ -41,30 +44,30 @@ void mockSecureStorage() {
   final storage = <String, String>{};
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(
-    const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
-    (MethodCall call) async {
-      switch (call.method) {
-        case 'read':
-          return storage[call.arguments['key'] as String];
-        case 'write':
-          storage[call.arguments['key'] as String] =
-              call.arguments['value'] as String? ?? '';
-          return null;
-        case 'delete':
-          storage.remove(call.arguments['key'] as String);
-          return null;
-        case 'readAll':
-          return Map<String, String>.from(storage);
-        case 'deleteAll':
-          storage.clear();
-          return null;
-        case 'containsKey':
-          return storage.containsKey(call.arguments['key'] as String);
-        default:
-          return null;
-      }
-    },
-  );
+        const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
+        (MethodCall call) async {
+          switch (call.method) {
+            case 'read':
+              return storage[call.arguments['key'] as String];
+            case 'write':
+              storage[call.arguments['key'] as String] =
+                  call.arguments['value'] as String? ?? '';
+              return null;
+            case 'delete':
+              storage.remove(call.arguments['key'] as String);
+              return null;
+            case 'readAll':
+              return Map<String, String>.from(storage);
+            case 'deleteAll':
+              storage.clear();
+              return null;
+            case 'containsKey':
+              return storage.containsKey(call.arguments['key'] as String);
+            default:
+              return null;
+          }
+        },
+      );
 }
 
 // ---------------------------------------------------------------------------
@@ -81,8 +84,5 @@ Widget testApp({String initialRoute = AppRouter.home}) {
 }
 
 Widget testWidget(Widget child) {
-  return MaterialApp(
-    theme: RummelBlueTheme.light(),
-    home: child,
-  );
+  return MaterialApp(theme: RummelBlueTheme.light(), home: child);
 }

@@ -39,12 +39,19 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, AppRouter.home, (_) => false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRouter.home,
+          (_) => false,
+        );
       }
     } on AuthException catch (e) {
       setState(() => _errorMessage = e.message);
     } catch (_) {
-      setState(() => _errorMessage = 'Unable to connect. Check your network and try again.');
+      setState(
+        () => _errorMessage =
+            'Unable to connect. Check your network and try again.',
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -88,12 +95,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   prefixIcon: const Icon(Icons.lock_outlined),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                      _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                     ),
-                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
-                validator: (v) => (v == null || v.isEmpty) ? 'Password is required' : null,
+                validator: (v) =>
+                    (v == null || v.isEmpty) ? 'Password is required' : null,
               ),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 16),
@@ -122,7 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, AppRouter.register),
+                onPressed: () =>
+                    Navigator.pushReplacementNamed(context, AppRouter.register),
                 child: const Text("Don't have an account? Register"),
               ),
             ],

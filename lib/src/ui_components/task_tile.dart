@@ -19,7 +19,9 @@ class TaskTile extends StatelessWidget {
 
   String _formatTime(DateTime? time) {
     if (time == null) return '';
-    final hour = time.hour == 0 ? 12 : (time.hour > 12 ? time.hour - 12 : time.hour);
+    final hour = time.hour == 0
+        ? 12
+        : (time.hour > 12 ? time.hour - 12 : time.hour);
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $period';
@@ -56,10 +58,7 @@ class TaskTile extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Checkbox(
-                  value: task.completed,
-                  onChanged: onCompletedChanged,
-                ),
+                Checkbox(value: task.completed, onChanged: onCompletedChanged),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

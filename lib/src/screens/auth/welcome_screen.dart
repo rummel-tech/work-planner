@@ -43,7 +43,8 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               OutlinedButton(
-                onPressed: () => Navigator.pushNamed(context, AppRouter.register),
+                onPressed: () =>
+                    Navigator.pushNamed(context, AppRouter.register),
                 child: const Text('Create Account'),
               ),
               const SizedBox(height: 32),

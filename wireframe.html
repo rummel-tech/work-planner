@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Planner — Dashboard Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #e8eaf0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Phone shell ─────────────────────────────── */
+  .phone {
+    width: 375px;
+    background: #fff;
+    border-radius: 40px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.18), 0 0 0 10px #1a1a2e;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 812px;
+  }
+
+  .phone-label {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 10px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+
+  /* ── Status bar ──────────────────────────────── */
+  .status-bar {
+    background: #1565c0;
+    color: #fff;
+    font-size: 11px;
+    padding: 6px 16px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── App bar ─────────────────────────────────── */
+  .app-bar {
+    background: #1565c0;
+    color: #fff;
+    padding: 12px 16px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  /* ── Offline banner ──────────────────────────── */
+  .offline-banner {
+    background: #fff3e0;
+    border-bottom: 1px solid #ffcc80;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: #e65100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .offline-banner.hidden { display: none; }
+
+  /* ── Scrollable content ──────────────────────── */
+  .screen-body {
+    flex: 1;
+    overflow-y: auto;
+    background: #f5f6fa;
+  }
+
+  /* ── Week progress card ──────────────────────── */
+  .week-card {
+    margin: 12px 12px 0;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+
+  .ring {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 5px solid #e3f2fd;
+    border-top-color: #1565c0;
+    border-right-color: #1565c0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1565c0;
+    flex-shrink: 0;
+  }
+
+  .week-info { flex: 1; }
+  .week-info .title { font-size: 13px; font-weight: 600; color: #222; }
+  .week-info .sub   { font-size: 11px; color: #888; margin-top: 2px; }
+
+  .week-arrow {
+    color: #aaa;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* ── Dashboard tab bar ───────────────────────── */
+  .dash-tabs {
+    display: flex;
+    overflow-x: auto;
+    background: #fff;
+    border-bottom: 2px solid #e0e0e0;
+    margin-top: 8px;
+    scrollbar-width: none;
+  }
+  .dash-tabs::-webkit-scrollbar { display: none; }
+
+  .dash-tab {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #777;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+  }
+  .dash-tab.active {
+    color: #1565c0;
+    border-bottom-color: #1565c0;
+    font-weight: 700;
+  }
+
+  /* ── Tab content panels ──────────────────────── */
+  .tab-panel { display: none; padding: 12px; }
+  .tab-panel.active { display: block; }
+
+  /* ── Goals row ───────────────────────────────── */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .view-all {
+    font-size: 11px;
+    color: #1565c0;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .goals-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .goal-chip {
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 8px 8px 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    min-width: 0;
+  }
+  .goal-chip-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .goal-chip-icon { font-size: 12px; }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-green  { background: #43a047; }
+  .dot-blue   { background: #1e88e5; }
+  .dot-grey   { background: #bbb; }
+  .dot-amber  { background: #ffa000; }
+
+  .goal-chip-text {
+    font-size: 10px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  /* ── Pomodoro blocks ─────────────────────────── */
+  .section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .section-title-lg { font-size: 14px; font-weight: 700; color: #222; }
+  .done-badge { font-size: 11px; color: #888; }
+
+  .pomo-block {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .pomo-header {
+    display: flex;
+    align-items: center;
+    padding: 9px 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .pomo-icon { font-size: 16px; margin-right: 8px; }
+  .pomo-label { font-size: 13px; font-weight: 600; color: #333; flex: 1; }
+  .pomo-sub { font-size: 11px; color: #aaa; margin-right: 8px; }
+  .add-btn {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid #1565c0;
+    color: #1565c0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .pomo-tasks { padding: 2px 0 4px; }
+
+  .task-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    gap: 8px;
+  }
+  .task-row + .task-row {
+    border-top: 1px solid #f5f5f5;
+  }
+  .checkbox {
+    width: 15px; height: 15px;
+    border-radius: 4px;
+    border: 1.5px solid #bbb;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #fff;
+  }
+  .checkbox.checked {
+    background: #43a047;
+    border-color: #43a047;
+  }
+  .task-text {
+    flex: 1;
+    font-size: 12px;
+    color: #333;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .task-text.done { text-decoration: line-through; color: #aaa; }
+
+  .priority-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .p-urgent { background: #ffebee; color: #c62828; }
+  .p-high   { background: #fff3e0; color: #e65100; }
+  .p-med    { background: #e8f5e9; color: #2e7d32; }
+  .p-low    { background: #f3f4f6; color: #777; }
+
+  .pomo-empty {
+    padding: 8px 12px 10px;
+    font-size: 11px;
+    color: #bbb;
+    font-style: italic;
+  }
+
+  /* ── Add task button ─────────────────────────── */
+  .add-task-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #1565c0;
+    color: #fff;
+    border-radius: 10px;
+    padding: 11px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+    cursor: pointer;
+  }
+
+  /* ── Side hustle task list ───────────────────── */
+  .task-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  /* ── External task sections ──────────────────── */
+  .ext-section { margin-bottom: 16px; }
+
+  .ext-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .ext-icon { font-size: 14px; }
+  .ext-title { font-size: 13px; font-weight: 700; color: #333; }
+  .ext-count { font-size: 11px; color: #999; }
+
+  .ext-task {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .ext-task-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .dot-red    { background: #e53935; }
+  .dot-orange { background: #fb8c00; }
+
+  .ext-task-body { flex: 1; min-width: 0; }
+  .ext-task-title { font-size: 12px; font-weight: 600; color: #222; }
+  .ext-task-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+  }
+  .ext-task-date { font-size: 10px; color: #e53935; }
+  .ext-task-date.ok { color: #888; }
+  .ext-cat {
+    font-size: 9px;
+    background: #f0f0f0;
+    color: #666;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* ── Bottom nav ──────────────────────────────── */
+  .bottom-nav {
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 0 10px;
+    cursor: pointer;
+    font-size: 10px;
+    color: #999;
+    gap: 3px;
+  }
+  .nav-item.active { color: #1565c0; }
+  .nav-icon { font-size: 20px; }
+
+  /* ── Legend panel ────────────────────────────── */
+  .legend {
+    width: 280px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+    align-self: flex-start;
+  }
+  .legend h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f0f0f0;
+  }
+  .legend-section { margin-bottom: 16px; }
+  .legend-section h3 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: #444;
+  }
+  .swatch {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .sw-corp   { background: #1565c0; }
+  .sw-farm   { background: #2e7d32; }
+  .sw-app    { background: #e65100; }
+  .sw-home   { background: #6a1b9a; }
+  .legend-note {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.5;
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     PHONE 1 — CORP TAB
+════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="phone-label">Corp Tab</div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
+    <div class="app-bar">Work Planner</div>
+    <div class="offline-banner hidden">📶 Offline — showing cached data</div>
+
+    <div class="screen-body">
+      <!-- Week Progress -->
+      <div class="week-card">
+        <div class="ring">65%</div>
+        <div class="week-info">
+          <div class="title">Week Progress</div>
+          <div class="sub">3 weekly goals</div>
+        </div>
+        <div class="week-arrow">›</div>
+      </div>
+
+      <!-- Dashboard Tabs -->
+      <div class="dash-tabs">
+        <div class="dash-tab active">Corp</div>
+        <div class="dash-tab">Farm</div>
+        <div class="dash-tab">App Dev</div>
+        <div class="dash-tab">Home &amp; Auto</div>
+      </div>
+
+      <!-- Corp Tab Panel -->
+      <div class="tab-panel active">
+
+        <!-- Goals Row -->
+        <div class="section-header">
+          <div class="section-title">Goals</div>
+          <div class="view-all">View All</div>
+        </div>
+        <div class="goals-row">
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">💼</span>
+              <div class="status-dot dot-green"></div>
+            </div>
+            <div class="goal-chip-text">Q4 Sales Target</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">💼</span>
+              <div class="status-dot dot-amber"></div>
+            </div>
+            <div class="goal-chip-text">Team KPI Review</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">💼</span>
+              <div class="status-dot dot-grey"></div>
+            </div>
+            <div class="goal-chip-text">Budget Planning</div>
+          </div>
+        </div>
+
+        <!-- Pomodoro Blocks -->
+        <div class="section-title-row">
+          <div class="section-title-lg">Today's Pomodoros</div>
+          <div class="done-badge">3 / 7 done</div>
+        </div>
+
+        <div class="pomo-block">
+          <div class="pomo-header">
+            <span class="pomo-icon">🍅</span>
+            <span class="pomo-label">Block 1</span>
+            <span class="pomo-sub">2 / 2 done</span>
+            <div class="add-btn">+</div>
+          </div>
+          <div class="pomo-tasks">
+            <div class="task-row">
+              <div class="checkbox checked">✓</div>
+              <div class="task-text done">Write Q4 report draft</div>
+              <div class="priority-badge p-high">High</div>
+            </div>
+            <div class="task-row">
+              <div class="checkbox checked">✓</div>
+              <div class="task-text done">Team standup</div>
+              <div class="priority-badge p-urgent">Urgent</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pomo-block">
+          <div class="pomo-header">
+            <span class="pomo-icon">🍅</span>
+            <span class="pomo-label">Block 2</span>
+            <span class="pomo-sub">1 / 2 done</span>
+            <div class="add-btn">+</div>
+          </div>
+          <div class="pomo-tasks">
+            <div class="task-row">
+              <div class="checkbox checked">✓</div>
+              <div class="task-text done">Review PR #42</div>
+              <div class="priority-badge p-med">Med</div>
+            </div>
+            <div class="task-row">
+              <div class="checkbox"></div>
+              <div class="task-text">Update product roadmap</div>
+              <div class="priority-badge p-med">Med</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pomo-block">
+          <div class="pomo-header">
+            <span class="pomo-icon">🍅</span>
+            <span class="pomo-label">Block 3</span>
+            <span class="pomo-sub"></span>
+            <div class="add-btn">+</div>
+          </div>
+          <div class="pomo-empty">No tasks assigned — tap + to add</div>
+        </div>
+
+        <div class="pomo-block">
+          <div class="pomo-header">
+            <span class="pomo-icon">🍅</span>
+            <span class="pomo-label">Block 4</span>
+            <span class="pomo-sub"></span>
+            <div class="add-btn">+</div>
+          </div>
+          <div class="pomo-empty">No tasks assigned — tap + to add</div>
+        </div>
+
+      </div><!-- /tab-panel -->
+    </div><!-- /screen-body -->
+
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon">🏠</div>Home</div>
+      <div class="nav-item"><div class="nav-icon">🚩</div>Goals</div>
+      <div class="nav-item"><div class="nav-icon">📅</div>Week</div>
+      <div class="nav-item"><div class="nav-icon">📋</div>Today</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PHONE 2 — FARM TAB
+════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="phone-label">Farm Tab</div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
+    <div class="app-bar">Work Planner</div>
+
+    <div class="screen-body">
+      <div class="week-card">
+        <div class="ring">65%</div>
+        <div class="week-info">
+          <div class="title">Week Progress</div>
+          <div class="sub">3 weekly goals</div>
+        </div>
+        <div class="week-arrow">›</div>
+      </div>
+
+      <div class="dash-tabs">
+        <div class="dash-tab">Corp</div>
+        <div class="dash-tab active">Farm</div>
+        <div class="dash-tab">App Dev</div>
+        <div class="dash-tab">Home &amp; Auto</div>
+      </div>
+
+      <div class="tab-panel active">
+
+        <div class="section-header">
+          <div class="section-title">Goals</div>
+          <div class="view-all">View All</div>
+        </div>
+        <div class="goals-row">
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">🌱</span>
+              <div class="status-dot dot-green"></div>
+            </div>
+            <div class="goal-chip-text">Expand Pasture</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">🌱</span>
+              <div class="status-dot dot-amber"></div>
+            </div>
+            <div class="goal-chip-text">Irrigation System</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">🌱</span>
+              <div class="status-dot dot-grey"></div>
+            </div>
+            <div class="goal-chip-text">Q3 Harvest Plan</div>
+          </div>
+        </div>
+
+        <div class="section-title-row">
+          <div class="section-title-lg">Today's Tasks</div>
+          <div class="done-badge">1 / 3 done</div>
+        </div>
+
+        <div class="task-card">
+          <div class="task-row">
+            <div class="checkbox checked">✓</div>
+            <div class="task-text done">Check irrigation timer</div>
+            <div class="priority-badge p-high">High</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox"></div>
+            <div class="task-text">Order seed inventory</div>
+            <div class="priority-badge p-med">Med</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox"></div>
+            <div class="task-text">Fence repair — north field</div>
+            <div class="priority-badge p-low">Low</div>
+          </div>
+        </div>
+
+        <div class="add-task-btn">＋ &nbsp;Add Task</div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon">🏠</div>Home</div>
+      <div class="nav-item"><div class="nav-icon">🚩</div>Goals</div>
+      <div class="nav-item"><div class="nav-icon">📅</div>Week</div>
+      <div class="nav-item"><div class="nav-icon">📋</div>Today</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PHONE 3 — APP DEV TAB
+════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="phone-label">App Dev Tab</div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
+    <div class="app-bar">Work Planner</div>
+
+    <div class="screen-body">
+      <div class="week-card">
+        <div class="ring">65%</div>
+        <div class="week-info">
+          <div class="title">Week Progress</div>
+          <div class="sub">3 weekly goals</div>
+        </div>
+        <div class="week-arrow">›</div>
+      </div>
+
+      <div class="dash-tabs">
+        <div class="dash-tab">Corp</div>
+        <div class="dash-tab">Farm</div>
+        <div class="dash-tab active">App Dev</div>
+        <div class="dash-tab">Home &amp; Auto</div>
+      </div>
+
+      <div class="tab-panel active">
+
+        <div class="section-header">
+          <div class="section-title">Goals</div>
+          <div class="view-all">View All</div>
+        </div>
+        <div class="goals-row">
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">💻</span>
+              <div class="status-dot dot-green"></div>
+            </div>
+            <div class="goal-chip-text">Launch Artemis v1</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">💻</span>
+              <div class="status-dot dot-blue"></div>
+            </div>
+            <div class="goal-chip-text">API v2 Design</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">💻</span>
+              <div class="status-dot dot-grey"></div>
+            </div>
+            <div class="goal-chip-text">Flutter Test Suite</div>
+          </div>
+        </div>
+
+        <div class="section-title-row">
+          <div class="section-title-lg">Today's Tasks</div>
+          <div class="done-badge">0 / 3 done</div>
+        </div>
+
+        <div class="task-card">
+          <div class="task-row">
+            <div class="checkbox"></div>
+            <div class="task-text">Fix auth token refresh bug</div>
+            <div class="priority-badge p-urgent">Urgent</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox"></div>
+            <div class="task-text">Write unit tests for planner</div>
+            <div class="priority-badge p-high">High</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox"></div>
+            <div class="task-text">Design home screen v2</div>
+            <div class="priority-badge p-med">Med</div>
+          </div>
+        </div>
+
+        <div class="add-task-btn">＋ &nbsp;Add Task</div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon">🏠</div>Home</div>
+      <div class="nav-item"><div class="nav-icon">🚩</div>Goals</div>
+      <div class="nav-item"><div class="nav-icon">📅</div>Week</div>
+      <div class="nav-item"><div class="nav-icon">📋</div>Today</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PHONE 4 — HOME & AUTO TAB
+════════════════════════════════════════════════════════════ -->
+<div>
+  <div class="phone-label">Home &amp; Auto Tab</div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>⚡ 100%</span></div>
+    <div class="app-bar">Work Planner</div>
+
+    <div class="screen-body">
+      <div class="week-card">
+        <div class="ring">65%</div>
+        <div class="week-info">
+          <div class="title">Week Progress</div>
+          <div class="sub">3 weekly goals</div>
+        </div>
+        <div class="week-arrow">›</div>
+      </div>
+
+      <div class="dash-tabs">
+        <div class="dash-tab">Corp</div>
+        <div class="dash-tab">Farm</div>
+        <div class="dash-tab">App Dev</div>
+        <div class="dash-tab active">Home &amp; Auto</div>
+      </div>
+
+      <div class="tab-panel active">
+
+        <div class="section-header">
+          <div class="section-title">Goals</div>
+          <div class="view-all">View All</div>
+        </div>
+        <div class="goals-row">
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">🏠</span>
+              <div class="status-dot dot-green"></div>
+            </div>
+            <div class="goal-chip-text">Kitchen Renovation</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">🏠</span>
+              <div class="status-dot dot-grey"></div>
+            </div>
+            <div class="goal-chip-text">Garage Organize</div>
+          </div>
+          <div class="goal-chip">
+            <div class="goal-chip-top">
+              <span class="goal-chip-icon">🚗</span>
+              <div class="status-dot dot-amber"></div>
+            </div>
+            <div class="goal-chip-text">Vehicle Upkeep</div>
+          </div>
+        </div>
+
+        <!-- Home section (from home-manager) -->
+        <div class="ext-section">
+          <div class="ext-header">
+            <span class="ext-icon">🏠</span>
+            <span class="ext-title">Home</span>
+            <span class="ext-count">4 tasks</span>
+          </div>
+
+          <div class="ext-task">
+            <div class="ext-task-dot dot-red"></div>
+            <div class="ext-task-body">
+              <div class="ext-task-title">Fix leaking kitchen faucet</div>
+              <div class="ext-task-meta">
+                <span class="ext-task-date">Overdue: 4/10/2026</span>
+                <span class="ext-cat">plumbing</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ext-task">
+            <div class="ext-task-dot dot-orange"></div>
+            <div class="ext-task-body">
+              <div class="ext-task-title">Clean gutters</div>
+              <div class="ext-task-meta">
+                <span class="ext-task-date ok">Due: 4/20/2026</span>
+                <span class="ext-cat">maintenance</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ext-task">
+            <div class="ext-task-dot" style="background:#fdd835"></div>
+            <div class="ext-task-body">
+              <div class="ext-task-title">Replace smoke detector batteries</div>
+              <div class="ext-task-meta">
+                <span class="ext-task-date ok">Due: 4/25/2026</span>
+                <span class="ext-cat">safety</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ext-task">
+            <div class="ext-task-dot dot-grey"></div>
+            <div class="ext-task-body">
+              <div class="ext-task-title">Touch up garage paint</div>
+              <div class="ext-task-meta">
+                <span class="ext-task-date ok">Due: 5/1/2026</span>
+                <span class="ext-cat">painting</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle section (from vehicle-manager) -->
+        <div class="ext-section">
+          <div class="ext-header">
+            <span class="ext-icon">🚗</span>
+            <span class="ext-title">Vehicle</span>
+            <span class="ext-count">2 tasks</span>
+          </div>
+
+          <div class="ext-task">
+            <div class="ext-task-dot dot-red"></div>
+            <div class="ext-task-body">
+              <div class="ext-task-title">Oil Change — Toyota Camry</div>
+              <div class="ext-task-meta">
+                <span class="ext-task-date">Overdue: 4/1/2026</span>
+                <span class="ext-cat">oil_change</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ext-task">
+            <div class="ext-task-dot dot-orange"></div>
+            <div class="ext-task-body">
+              <div class="ext-task-title">Tire Rotation — Toyota Camry</div>
+              <div class="ext-task-meta">
+                <span class="ext-task-date ok">Due: 4/18/2026</span>
+                <span class="ext-cat">tire_rotation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon">🏠</div>Home</div>
+      <div class="nav-item"><div class="nav-icon">🚩</div>Goals</div>
+      <div class="nav-item"><div class="nav-icon">📅</div>Week</div>
+      <div class="nav-item"><div class="nav-icon">📋</div>Today</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LEGEND
+════════════════════════════════════════════════════════════ -->
+<div class="legend">
+  <h2>Dashboard Wireframe</h2>
+
+  <div class="legend-section">
+    <h3>Tab Colors</h3>
+    <div class="legend-row"><div class="swatch sw-corp"></div> Corp — Corporate pomodoro work</div>
+    <div class="legend-row"><div class="swatch sw-farm"></div> Farm — Farm side hustle</div>
+    <div class="legend-row"><div class="swatch sw-app"></div> App Dev — Software side hustle</div>
+    <div class="legend-row"><div class="swatch sw-home"></div> Home &amp; Auto — External tasks</div>
+  </div>
+
+  <div class="legend-section">
+    <h3>Goal Status Dots</h3>
+    <div class="legend-row"><div class="status-dot dot-green"></div> In Progress</div>
+    <div class="legend-row"><div class="status-dot dot-blue"></div> Completed</div>
+    <div class="legend-row"><div class="status-dot dot-amber"></div> Not Started</div>
+    <div class="legend-row"><div class="status-dot dot-grey"></div> Abandoned</div>
+  </div>
+
+  <div class="legend-section">
+    <h3>Priority Badges</h3>
+    <div class="legend-row"><div class="priority-badge p-urgent">Urgent</div> Immediate action</div>
+    <div class="legend-row"><div class="priority-badge p-high">High</div> Do today</div>
+    <div class="legend-row"><div class="priority-badge p-med">Med</div> Do this week</div>
+    <div class="legend-row"><div class="priority-badge p-low">Low</div> Whenever</div>
+  </div>
+
+  <div class="legend-section">
+    <h3>External Task Dots</h3>
+    <div class="legend-row"><div class="ext-task-dot dot-red" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div> Urgent / Overdue</div>
+    <div class="legend-row"><div class="ext-task-dot dot-orange" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div> High / Due &lt; 7 days</div>
+    <div class="legend-row"><div class="ext-task-dot" style="width:9px;height:9px;border-radius:50%;background:#fdd835;flex-shrink:0"></div> Medium / Due &lt; 14 days</div>
+    <div class="legend-row"><div class="ext-task-dot dot-grey" style="width:9px;height:9px;border-radius:50%;flex-shrink:0"></div> Low / Due &lt; 30 days</div>
+  </div>
+
+  <div class="legend-note">
+    <strong>Home &amp; Auto</strong> tasks are read-only — pulled live from the
+    home-manager (port 8020) and vehicle-manager (port 8030) services via
+    <code>GET /api/v1/work-planner/tasks</code>. Pull-to-refresh re-fetches both.
+  </div>
+</div>
+
+</body>
+</html>

@@ -55,15 +55,17 @@ void main() {
       expect(await auth.isAuthenticated(), isTrue);
     });
 
-    test('register without a code also authenticates (fake always succeeds)',
-        () async {
-      final result = await auth.register(
-        email: 'waitlister@test.com',
-        password: 'pass1234',
-      );
-      expect(result['status'], 'registered');
-      expect(await auth.isAuthenticated(), isTrue);
-    });
+    test(
+      'register without a code also authenticates (fake always succeeds)',
+      () async {
+        final result = await auth.register(
+          email: 'waitlister@test.com',
+          password: 'pass1234',
+        );
+        expect(result['status'], 'registered');
+        expect(await auth.isAuthenticated(), isTrue);
+      },
+    );
 
     test('logout removes authentication and clears tokens', () async {
       await auth.login(email: 'test@test.com', password: 'password123');

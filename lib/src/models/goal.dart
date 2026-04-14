@@ -29,19 +29,20 @@ class Goal {
     GoalStatus status = GoalStatus.notStarted,
     required GoalType type,
   }) : this._(
-          id: id ?? const Uuid().v4(),
-          title: title,
-          description: description,
-          createdAt: createdAt ?? DateTime.now(),
-          targetDate: targetDate,
-          status: status,
-          type: type,
-        );
+         id: id ?? const Uuid().v4(),
+         title: title,
+         description: description,
+         createdAt: createdAt ?? DateTime.now(),
+         targetDate: targetDate,
+         status: status,
+         type: type,
+       );
 
   Goal copyWith({
     String? title,
     String? description,
     DateTime? targetDate,
+    bool clearTargetDate = false,
     GoalStatus? status,
     GoalType? type,
   }) {
@@ -50,7 +51,7 @@ class Goal {
       title: title ?? this.title,
       description: description ?? this.description,
       createdAt: createdAt,
-      targetDate: targetDate ?? this.targetDate,
+      targetDate: clearTargetDate ? null : (targetDate ?? this.targetDate),
       status: status ?? this.status,
       type: type ?? this.type,
     );
@@ -72,15 +73,12 @@ class Goal {
 }
 
 /// Status of a goal
-enum GoalStatus {
-  notStarted,
-  inProgress,
-  completed,
-  abandoned,
-}
+enum GoalStatus { notStarted, inProgress, completed, abandoned }
 
-/// Type of goal (corporate or entrepreneurial)
+/// Type of goal — determines which dashboard tab it belongs to
 enum GoalType {
-  corporate,
-  entrepreneurial,
+  corporate,       // Corp tab — pomodoro-based work
+  farm,            // Farm tab — farm side hustle
+  appDevelopment,  // App Dev tab — software side hustle
+  homeAuto,        // Home & Auto tab — household/vehicle goals
 }

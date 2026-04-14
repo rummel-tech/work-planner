@@ -14,13 +14,17 @@ class ApiService {
   // Goals
   // ---------------------------------------------------------------------------
 
-  Future<List<Map<String, dynamic>>> getGoals({String? goalType, String? status}) async {
+  Future<List<Map<String, dynamic>>> getGoals({
+    String? goalType,
+    String? status,
+  }) async {
     var path = '/goals';
     final params = <String, String>{};
     if (goalType != null) params['goal_type'] = goalType;
     if (status != null) params['goal_status'] = status;
     if (params.isNotEmpty) {
-      path += '?${params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&')}';
+      path +=
+          '?${params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&')}';
     }
     final resp = await _get(path);
     return (resp as List).cast<Map<String, dynamic>>();
@@ -30,7 +34,10 @@ class ApiService {
     return await _post('/goals', body) as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> updateGoal(String id, Map<String, dynamic> body) async {
+  Future<Map<String, dynamic>> updateGoal(
+    String id,
+    Map<String, dynamic> body,
+  ) async {
     return await _patch('/goals/$id', body) as Map<String, dynamic>;
   }
 
@@ -42,13 +49,17 @@ class ApiService {
   // Plans
   // ---------------------------------------------------------------------------
 
-  Future<List<Map<String, dynamic>>> getPlans({String? goalId, String? status}) async {
+  Future<List<Map<String, dynamic>>> getPlans({
+    String? goalId,
+    String? status,
+  }) async {
     var path = '/plans';
     final params = <String, String>{};
     if (goalId != null) params['goal_id'] = goalId;
     if (status != null) params['plan_status'] = status;
     if (params.isNotEmpty) {
-      path += '?${params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&')}';
+      path +=
+          '?${params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&')}';
     }
     final resp = await _get(path);
     return (resp as List).cast<Map<String, dynamic>>();
@@ -58,7 +69,10 @@ class ApiService {
     return await _post('/plans', body) as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> updatePlan(String id, Map<String, dynamic> body) async {
+  Future<Map<String, dynamic>> updatePlan(
+    String id,
+    Map<String, dynamic> body,
+  ) async {
     return await _patch('/plans/$id', body) as Map<String, dynamic>;
   }
 
@@ -74,19 +88,39 @@ class ApiService {
     return await _get('/day-planners/$date') as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> upsertDayPlanner(String date, {String? notes}) async {
-    return await _post('/day-planners', {'date': date, if (notes != null) 'notes': notes}) as Map<String, dynamic>;
+  Future<Map<String, dynamic>> upsertDayPlanner(
+    String date, {
+    String? notes,
+  }) async {
+    return await _post('/day-planners', {
+          'date': date,
+          if (notes != null) 'notes': notes,
+        })
+        as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> updateDayPlanner(String date, {String? notes}) async {
-    return await _patch('/day-planners/$date', {if (notes != null) 'notes': notes}) as Map<String, dynamic>;
+  Future<Map<String, dynamic>> updateDayPlanner(
+    String date, {
+    String? notes,
+  }) async {
+    return await _patch('/day-planners/$date', {
+          if (notes != null) 'notes': notes,
+        })
+        as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> createTask(String date, Map<String, dynamic> body) async {
-    return await _post('/day-planners/$date/tasks', body) as Map<String, dynamic>;
+  Future<Map<String, dynamic>> createTask(
+    String date,
+    Map<String, dynamic> body,
+  ) async {
+    return await _post('/day-planners/$date/tasks', body)
+        as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> updateTask(String taskId, Map<String, dynamic> body) async {
+  Future<Map<String, dynamic>> updateTask(
+    String taskId,
+    Map<String, dynamic> body,
+  ) async {
     return await _patch('/tasks/$taskId', body) as Map<String, dynamic>;
   }
 
@@ -102,23 +136,34 @@ class ApiService {
     return await _get('/week-planners/$weekStartDate') as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> upsertWeekPlanner(String weekStartDate, {List<String>? weeklyGoals, String? notes}) async {
+  Future<Map<String, dynamic>> upsertWeekPlanner(
+    String weekStartDate, {
+    List<String>? weeklyGoals,
+    String? notes,
+  }) async {
     return await _post('/week-planners', {
-      'week_start_date': weekStartDate,
-      if (weeklyGoals != null) 'weekly_goals': weeklyGoals,
-      if (notes != null) 'notes': notes,
-    }) as Map<String, dynamic>;
+          'week_start_date': weekStartDate,
+          if (weeklyGoals != null) 'weekly_goals': weeklyGoals,
+          if (notes != null) 'notes': notes,
+        })
+        as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> getWeekStats(String weekStartDate) async {
-    return await _get('/week-planners/$weekStartDate/stats') as Map<String, dynamic>;
+    return await _get('/week-planners/$weekStartDate/stats')
+        as Map<String, dynamic>;
   }
 
-  Future<Map<String, dynamic>> updateWeekPlanner(String weekStartDate, {List<String>? weeklyGoals, String? notes}) async {
+  Future<Map<String, dynamic>> updateWeekPlanner(
+    String weekStartDate, {
+    List<String>? weeklyGoals,
+    String? notes,
+  }) async {
     return await _patch('/week-planners/$weekStartDate', {
-      if (weeklyGoals != null) 'weekly_goals': weeklyGoals,
-      if (notes != null) 'notes': notes,
-    }) as Map<String, dynamic>;
+          if (weeklyGoals != null) 'weekly_goals': weeklyGoals,
+          if (notes != null) 'notes': notes,
+        })
+        as Map<String, dynamic>;
   }
 
   // ---------------------------------------------------------------------------
@@ -138,7 +183,10 @@ class ApiService {
 
   Future<dynamic> _get(String path) async {
     try {
-      final resp = await _auth.authenticatedRequest(method: 'GET', endpoint: path);
+      final resp = await _auth.authenticatedRequest(
+        method: 'GET',
+        endpoint: path,
+      );
       _checkStatus(resp);
       return jsonDecode(resp.body);
     } on AuthException {
@@ -151,7 +199,11 @@ class ApiService {
 
   Future<dynamic> _post(String path, Map<String, dynamic> body) async {
     try {
-      final resp = await _auth.authenticatedRequest(method: 'POST', endpoint: path, body: body);
+      final resp = await _auth.authenticatedRequest(
+        method: 'POST',
+        endpoint: path,
+        body: body,
+      );
       _checkStatus(resp);
       return jsonDecode(resp.body);
     } on AuthException {
@@ -164,7 +216,11 @@ class ApiService {
 
   Future<dynamic> _patch(String path, Map<String, dynamic> body) async {
     try {
-      final resp = await _auth.authenticatedRequest(method: 'PATCH', endpoint: path, body: body);
+      final resp = await _auth.authenticatedRequest(
+        method: 'PATCH',
+        endpoint: path,
+        body: body,
+      );
       _checkStatus(resp);
       return jsonDecode(resp.body);
     } on AuthException {
@@ -177,7 +233,10 @@ class ApiService {
 
   Future<void> _delete(String path) async {
     try {
-      final resp = await _auth.authenticatedRequest(method: 'DELETE', endpoint: path);
+      final resp = await _auth.authenticatedRequest(
+        method: 'DELETE',
+        endpoint: path,
+      );
       if (resp.statusCode != 204 && resp.statusCode != 200) {
         throw ApiException(resp.statusCode, _errorDetail(resp));
       }

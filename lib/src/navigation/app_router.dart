@@ -86,12 +86,15 @@ class AppRouter {
             date: args['date'] as DateTime,
             initialPlanId: args['planId'] as String?,
             initialPomodoroBlock: args['pomodoroBlock'] as int?,
+            initialTaskCategory: args['taskCategory'] as TaskCategory?,
           ),
         );
 
       case weeklyPlanner:
         final weekStart = settings.arguments as DateTime?;
-        return MaterialPageRoute(builder: (_) => WeeklyPlannerScreen(initialWeekStart: weekStart));
+        return MaterialPageRoute(
+          builder: (_) => WeeklyPlannerScreen(initialWeekStart: weekStart),
+        );
 
       default:
         return MaterialPageRoute(

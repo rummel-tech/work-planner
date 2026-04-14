@@ -48,8 +48,9 @@ void main() {
       expect(find.text('Weekly Goals'), findsOneWidget);
     });
 
-    testWidgets('shows "No weekly goals set" when goals list is empty',
-        (tester) async {
+    testWidgets('shows "No weekly goals set" when goals list is empty', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
       expect(find.text('No weekly goals set'), findsOneWidget);
@@ -63,8 +64,9 @@ void main() {
       }
     });
 
-    testWidgets('shows "No tasks" for each day when no tasks are scheduled',
-        (tester) async {
+    testWidgets('shows "No tasks" for each day when no tasks are scheduled', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
       expect(find.text('No tasks'), findsNWidgets(7));
@@ -76,16 +78,19 @@ void main() {
       expect(find.text('Notes'), findsOneWidget);
     });
 
-    testWidgets('shows previous and next week navigation buttons',
-        (tester) async {
+    testWidgets('shows previous and next week navigation buttons', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.chevron_left), findsOneWidget);
-      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      // Nav buttons are IconButtons; day-row trailing chevrons are plain Icons
+      expect(find.widgetWithIcon(IconButton, Icons.chevron_left), findsOneWidget);
+      expect(find.widgetWithIcon(IconButton, Icons.chevron_right), findsOneWidget);
     });
 
-    testWidgets('shows correct day-of-month numbers for the fixed week',
-        (tester) async {
+    testWidgets('shows correct day-of-month numbers for the fixed week', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
       // 16 Jun (Mon) through 22 Jun (Sun)

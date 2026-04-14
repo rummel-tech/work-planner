@@ -55,7 +55,10 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
 
   Future<void> _saveNotes() async {
     if (_planner == null) return;
-    await _plannerRepository.updateDayPlannerNotes(widget.date, _notesController.text);
+    await _plannerRepository.updateDayPlannerNotes(
+      widget.date,
+      _notesController.text,
+    );
   }
 
   Future<void> _addTaskToBlock(int? block) async {
@@ -78,8 +81,13 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
 
   String _formatDate() {
     final weekday = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-      'Friday', 'Saturday', 'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
     ][widget.date.weekday - 1];
     return '$weekday, ${widget.date.month}/${widget.date.day}/${widget.date.year}';
   }
@@ -99,9 +107,7 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
     final completionRate = _planner?.completionRate ?? 0.0;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isToday ? 'Today' : _formatDate()),
-      ),
+      appBar: AppBar(title: Text(_isToday ? 'Today' : _formatDate())),
       body: RefreshIndicator(
         onRefresh: _loadPlanner,
         child: ListView(
@@ -134,8 +140,15 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
               ),
             ),
             for (int block = 1; block <= 4; block++)
-              _buildBlock(block, tasks.where((t) => t.pomodoroBlock == block).toList(), theme),
-            _buildUnassignedBlock(tasks.where((t) => t.pomodoroBlock == null).toList(), theme),
+              _buildBlock(
+                block,
+                tasks.where((t) => t.pomodoroBlock == block).toList(),
+                theme,
+              ),
+            _buildUnassignedBlock(
+              tasks.where((t) => t.pomodoroBlock == null).toList(),
+              theme,
+            ),
             const SizedBox(height: 16),
             Card(
               child: Padding(
@@ -233,12 +246,14 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
               ),
             )
           else
-            ...blockTasks.map((task) => TaskTile(
-                  task: task,
-                  onCompletedChanged: (_) => _toggleTaskCompleted(task),
-                  onDelete: () => _deleteTask(task),
-                  onTap: () => _editTask(task),
-                )),
+            ...blockTasks.map(
+              (task) => TaskTile(
+                task: task,
+                onCompletedChanged: (_) => _toggleTaskCompleted(task),
+                onDelete: () => _deleteTask(task),
+                onTap: () => _editTask(task),
+              ),
+            ),
         ],
       ),
     );
@@ -255,7 +270,11 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
             child: Row(
               children: [
-                Icon(Icons.inbox_outlined, size: 20, color: theme.colorScheme.outline),
+                Icon(
+                  Icons.inbox_outlined,
+                  size: 20,
+                  color: theme.colorScheme.outline,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text('Unassigned', style: theme.textTheme.titleSmall),
@@ -269,12 +288,14 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
               ],
             ),
           ),
-          ...unassigned.map((task) => TaskTile(
-                task: task,
-                onCompletedChanged: (_) => _toggleTaskCompleted(task),
-                onDelete: () => _deleteTask(task),
-                onTap: () => _editTask(task),
-              )),
+          ...unassigned.map(
+            (task) => TaskTile(
+              task: task,
+              onCompletedChanged: (_) => _toggleTaskCompleted(task),
+              onDelete: () => _deleteTask(task),
+              onTap: () => _editTask(task),
+            ),
+          ),
         ],
       ),
     );

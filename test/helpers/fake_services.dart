@@ -1,8 +1,10 @@
+import 'package:artemis_work_planner/src/models/external_task.dart';
 import 'package:artemis_work_planner/src/models/goal.dart';
 import 'package:artemis_work_planner/src/models/plan.dart';
 import 'package:artemis_work_planner/src/planners/day_planner.dart';
 import 'package:artemis_work_planner/src/planners/week_planner.dart';
 import 'package:artemis_work_planner/src/services/auth_service.dart';
+import 'package:artemis_work_planner/src/services/external_task_service.dart';
 import 'package:artemis_work_planner/src/services/goal_repository.dart';
 import 'package:artemis_work_planner/src/services/plan_repository.dart';
 import 'package:artemis_work_planner/src/services/planner_repository.dart';
@@ -14,7 +16,8 @@ import 'package:artemis_work_planner/src/services/planner_repository.dart';
 class FakeAuthService extends AuthService {
   bool _authenticated;
 
-  FakeAuthService({bool authenticated = false}) : _authenticated = authenticated;
+  FakeAuthService({bool authenticated = false})
+    : _authenticated = authenticated;
 
   @override
   Future<bool> isAuthenticated() async => _authenticated;
@@ -48,16 +51,35 @@ class FakeAuthService extends AuthService {
   }
 
   @override
-  Future<String?> getAccessToken() async => _authenticated ? 'fake_token' : null;
+  Future<String?> getAccessToken() async =>
+      _authenticated ? 'fake_token' : null;
 
   @override
-  Future<String?> getRefreshToken() async => _authenticated ? 'fake_refresh' : null;
+  Future<String?> getRefreshToken() async =>
+      _authenticated ? 'fake_refresh' : null;
 
   @override
   Future<String?> getUserId() async => _authenticated ? 'test-user-id' : null;
 
   @override
   Future<String?> getEmail() async => _authenticated ? 'test@test.com' : null;
+}
+
+// ---------------------------------------------------------------------------
+// FakeExternalTaskService
+// ---------------------------------------------------------------------------
+
+class FakeExternalTaskService extends ExternalTaskService {
+  FakeExternalTaskService() : super(FakeAuthService());
+
+  @override
+  Future<List<ExternalTask>> getHomeManagerTasks() async => [];
+
+  @override
+  Future<List<ExternalTask>> getVehicleManagerTasks() async => [];
+
+  @override
+  Future<List<ExternalTask>> getAll() async => [];
 }
 
 // ---------------------------------------------------------------------------
@@ -88,9 +110,11 @@ class FakeGoalRepository extends GoalRepository {
 
   @override
   Future<List<Goal>> getActive() async => _data.values
-      .where((g) =>
-          g.status == GoalStatus.inProgress ||
-          g.status == GoalStatus.notStarted)
+      .where(
+        (g) =>
+            g.status == GoalStatus.inProgress ||
+            g.status == GoalStatus.notStarted,
+      )
       .toList();
 
   @override
@@ -192,26 +216,29 @@ class FakePlannerRepository extends PlannerRepository {
   @override
   Future<DayPlanner?> getDayPlannerByDate(DateTime date) async {
     final normalized = DateTime(date.year, date.month, date.day);
-    return _dayPlanners.values
-        .cast<DayPlanner?>()
-        .firstWhere((dp) => dp?.date == normalized, orElse: () => null);
+    return _dayPlanners.values.cast<DayPlanner?>().firstWhere(
+      (dp) => dp?.date == normalized,
+      orElse: () => null,
+    );
   }
 
   @override
   Future<List<DayPlanner>> getDayPlannersByDateRange(
-      DateTime start, DateTime end) async {
+    DateTime start,
+    DateTime end,
+  ) async {
     return _dayPlanners.values
-        .where((dp) =>
-            !dp.date.isBefore(start) && !dp.date.isAfter(end))
+        .where((dp) => !dp.date.isBefore(start) && !dp.date.isAfter(end))
         .toList();
   }
 
   @override
   Future<DayPlanner> getOrCreateDayPlanner(DateTime date) async {
     final normalized = DateTime(date.year, date.month, date.day);
-    final existing = _dayPlanners.values
-        .cast<DayPlanner?>()
-        .firstWhere((dp) => dp?.date == normalized, orElse: () => null);
+    final existing = _dayPlanners.values.cast<DayPlanner?>().firstWhere(
+      (dp) => dp?.date == normalized,
+      orElse: () => null,
+    );
     if (existing != null) return existing;
     final planner = DayPlanner.create(date: normalized);
     _dayPlanners[planner.id] = planner;
@@ -263,10 +290,14 @@ class FakePlannerRepository extends PlannerRepository {
   @override
   Future<WeekPlanner> getOrCreateWeekPlanner(DateTime weekStartDate) async {
     final normalized = DateTime(
-        weekStartDate.year, weekStartDate.month, weekStartDate.day);
-    final existing = _weekPlanners.values
-        .cast<WeekPlanner?>()
-        .firstWhere((wp) => wp?.weekStartDate == normalized, orElse: () => null);
+      weekStartDate.year,
+      weekStartDate.month,
+      weekStartDate.day,
+    );
+    final existing = _weekPlanners.values.cast<WeekPlanner?>().firstWhere(
+      (wp) => wp?.weekStartDate == normalized,
+      orElse: () => null,
+    );
     if (existing != null) return existing;
     final planner = WeekPlanner.create(weekStartDate: normalized);
     _weekPlanners[planner.id] = planner;
@@ -276,14 +307,18 @@ class FakePlannerRepository extends PlannerRepository {
   @override
   Future<WeekPlanner> getCurrentWeekPlanner() async {
     final now = DateTime.now();
-    final weekStart = DateTime(now.year, now.month, now.day)
-        .subtract(Duration(days: now.weekday - 1));
+    final weekStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(Duration(days: now.weekday - 1));
     return getOrCreateWeekPlanner(weekStart);
   }
 
   @override
   Future<Map<int, DayPlanner>> getDayPlannersForWeek(
-      WeekPlanner weekPlanner) async {
+    WeekPlanner weekPlanner,
+  ) async {
     final result = <int, DayPlanner>{};
     for (final entry in weekPlanner.dailyPlannerEntries) {
       final dp = _dayPlanners[entry.dayPlannerId];
@@ -294,7 +329,7 @@ class FakePlannerRepository extends PlannerRepository {
 
   @override
   Future<({int totalTasks, int completedTasks, double completionRate})>
-      getWeekStats(WeekPlanner weekPlanner) async {
+  getWeekStats(WeekPlanner weekPlanner) async {
     final dayPlanners = await getDayPlannersForWeek(weekPlanner);
     int total = 0;
     int completed = 0;
@@ -311,7 +346,9 @@ class FakePlannerRepository extends PlannerRepository {
 
   @override
   Future<WeekPlanner> updateWeekPlannerGoals(
-      DateTime weekStart, List<String> goals) async {
+    DateTime weekStart,
+    List<String> goals,
+  ) async {
     final planner = await getOrCreateWeekPlanner(weekStart);
     final updated = planner.copyWith(weeklyGoals: goals);
     _weekPlanners[updated.id] = updated;
@@ -320,7 +357,9 @@ class FakePlannerRepository extends PlannerRepository {
 
   @override
   Future<WeekPlanner> updateWeekPlannerNotes(
-      DateTime weekStart, String notes) async {
+    DateTime weekStart,
+    String notes,
+  ) async {
     final planner = await getOrCreateWeekPlanner(weekStart);
     final updated = planner.copyWith(notes: notes);
     _weekPlanners[updated.id] = updated;

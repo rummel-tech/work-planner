@@ -5,6 +5,7 @@ import 'src/services/api_config.dart';
 import 'src/services/api_service.dart';
 import 'src/services/auth_service.dart';
 import 'src/services/database_service.dart';
+import 'src/services/external_task_service.dart';
 import 'src/services/goal_repository.dart';
 import 'src/services/plan_repository.dart';
 import 'src/services/planner_repository.dart';
@@ -17,15 +18,20 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Configure API base URL (override via env/config in production builds)
-  ApiConfig.configure(baseUrl: const String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:8040',
-  ));
+  ApiConfig.configure(
+    baseUrl: const String.fromEnvironment(
+      'API_URL',
+      defaultValue: 'http://localhost:8040',
+    ),
+  );
 
   // Wire auth failure callback before any authenticated requests
   final authService = AuthService();
   authService.onAuthFailure = () {
-    navigatorKey.currentState?.pushNamedAndRemoveUntil(AppRouter.welcome, (_) => false);
+    navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      AppRouter.welcome,
+      (_) => false,
+    );
   };
 
   // Build the API service and inject into repositories
@@ -36,6 +42,7 @@ void main() async {
     goalRepo: GoalRepository(api: apiService),
     planRepo: PlanRepository(api: apiService),
     plannerRepo: PlannerRepository(api: apiService),
+    externalTaskService: ExternalTaskService(authService),
   );
 
   // Initialise local sembast database (used as offline cache)
@@ -44,7 +51,11 @@ void main() async {
   // Determine initial route based on auth state
   final isAuthenticated = await authService.isAuthenticated();
 
-  runApp(ArtemisWorkPlannerApp(initialRoute: isAuthenticated ? AppRouter.home : AppRouter.welcome));
+  runApp(
+    ArtemisWorkPlannerApp(
+      initialRoute: isAuthenticated ? AppRouter.home : AppRouter.welcome,
+    ),
+  );
 }
 
 class ArtemisWorkPlannerApp extends StatelessWidget {

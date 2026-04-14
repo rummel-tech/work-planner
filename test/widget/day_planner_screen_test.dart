@@ -26,16 +26,18 @@ void main() {
       expect(find.text('Block 4'), findsOneWidget);
     });
 
-    testWidgets('shows empty state text in each block when no tasks',
-        (tester) async {
+    testWidgets('shows empty state text in each block when no tasks', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
       expect(find.text('No tasks — tap + to add'), findsNWidgets(4));
     });
 
-    testWidgets('does not show Unassigned section when no tasks',
-        (tester) async {
+    testWidgets('does not show Unassigned section when no tasks', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
@@ -54,8 +56,9 @@ void main() {
       expect(find.text('Block 2 Task'), findsOneWidget);
     });
 
-    testWidgets('shows Unassigned section when task has no block',
-        (tester) async {
+    testWidgets('shows Unassigned section when task has no block', (
+      tester,
+    ) async {
       final task = Task.create(title: 'Floating Task');
       await fakePlanners.addTask(testDate, task);
 
@@ -67,7 +70,10 @@ void main() {
     });
 
     testWidgets('displays correct task count summary', (tester) async {
-      await fakePlanners.addTask(testDate, Task.create(title: 'T1', completed: true));
+      await fakePlanners.addTask(
+        testDate,
+        Task.create(title: 'T1', completed: true),
+      );
       await fakePlanners.addTask(testDate, Task.create(title: 'T2'));
 
       await tester.pumpWidget(buildScreen());

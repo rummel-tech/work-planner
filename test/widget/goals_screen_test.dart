@@ -22,13 +22,15 @@ void main() {
       expect(find.text('Create your first goal to get started'), findsWidgets);
     });
 
-    testWidgets('shows All / Corporate / Entrepreneurial tabs', (tester) async {
+    testWidgets('shows All / Corp / Farm / App Dev / Home & Auto tabs', (tester) async {
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
       expect(find.text('All'), findsOneWidget);
-      expect(find.text('Corporate'), findsOneWidget);
-      expect(find.text('Entrepreneurial'), findsOneWidget);
+      expect(find.text('Corp'), findsOneWidget);
+      expect(find.text('Farm'), findsOneWidget);
+      expect(find.text('App Dev'), findsOneWidget);
+      expect(find.text('Home & Auto'), findsOneWidget);
     });
 
     testWidgets('shows FAB', (tester) async {
@@ -41,15 +43,17 @@ void main() {
     testWidgets('shows seeded goals in All tab', (tester) async {
       fakeGoals.seed([
         Goal.create(
-            id: 'g1',
-            title: 'Launch Product',
-            description: 'Ship v1',
-            type: GoalType.entrepreneurial),
+          id: 'g1',
+          title: 'Launch Product',
+          description: 'Ship v1',
+          type: GoalType.farm,
+        ),
         Goal.create(
-            id: 'g2',
-            title: 'Q3 OKRs',
-            description: 'Corporate goals',
-            type: GoalType.corporate),
+          id: 'g2',
+          title: 'Q3 OKRs',
+          description: 'Corporate goals',
+          type: GoalType.corporate,
+        ),
       ]);
 
       await tester.pumpWidget(buildScreen());
@@ -59,52 +63,57 @@ void main() {
       expect(find.text('Q3 OKRs'), findsOneWidget);
     });
 
-    testWidgets('Corporate tab shows only corporate goals', (tester) async {
+    testWidgets('Corp tab shows only corporate goals', (tester) async {
       fakeGoals.seed([
         Goal.create(
-            id: 'g1',
-            title: 'Corp Goal',
-            description: 'D',
-            type: GoalType.corporate),
+          id: 'g1',
+          title: 'Corp Goal',
+          description: 'D',
+          type: GoalType.corporate,
+        ),
         Goal.create(
-            id: 'g2',
-            title: 'Startup Goal',
-            description: 'D',
-            type: GoalType.entrepreneurial),
+          id: 'g2',
+          title: 'Farm Goal',
+          description: 'D',
+          type: GoalType.farm,
+        ),
       ]);
 
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(Tab, 'Corporate'));
+      await tester.tap(find.widgetWithText(Tab, 'Corp'));
       await tester.pumpAndSettle();
 
       expect(find.text('Corp Goal'), findsOneWidget);
-      expect(find.text('Startup Goal'), findsNothing);
+      expect(find.text('Farm Goal'), findsNothing);
     });
 
-    testWidgets('Entrepreneurial tab shows only entrepreneurial goals',
-        (tester) async {
+    testWidgets('Farm tab shows only farm goals', (
+      tester,
+    ) async {
       fakeGoals.seed([
         Goal.create(
-            id: 'g1',
-            title: 'Corp Goal',
-            description: 'D',
-            type: GoalType.corporate),
+          id: 'g1',
+          title: 'Corp Goal',
+          description: 'D',
+          type: GoalType.corporate,
+        ),
         Goal.create(
-            id: 'g2',
-            title: 'Startup Goal',
-            description: 'D',
-            type: GoalType.entrepreneurial),
+          id: 'g2',
+          title: 'Farm Goal',
+          description: 'D',
+          type: GoalType.farm,
+        ),
       ]);
 
       await tester.pumpWidget(buildScreen());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(Tab, 'Entrepreneurial'));
+      await tester.tap(find.widgetWithText(Tab, 'Farm'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Startup Goal'), findsOneWidget);
+      expect(find.text('Farm Goal'), findsOneWidget);
       expect(find.text('Corp Goal'), findsNothing);
     });
   });
