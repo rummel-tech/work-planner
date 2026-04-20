@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.rummeltech.work_planner"
+    namespace = "com.rummeltech.work.planner"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.rummeltech.work_planner"
+        applicationId = "com.rummeltech.work.planner"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23 // flutter_secure_storage encryptedSharedPreferences requires API 23+

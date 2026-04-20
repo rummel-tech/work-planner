@@ -1,4 +1,4 @@
-package com.rummeltech.work_planner
+package com.rummeltech.work.planner
 
 import io.flutter.embedding.android.FlutterActivity
 
