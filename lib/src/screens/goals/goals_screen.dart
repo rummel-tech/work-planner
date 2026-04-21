@@ -7,7 +7,10 @@ import '../../ui_components/empty_state.dart';
 import '../../navigation/app_router.dart';
 
 class GoalsScreen extends StatefulWidget {
-  const GoalsScreen({super.key});
+  /// When true, suppresses Scaffold/AppBar/FAB for embedding in a parent shell.
+  final bool embedded;
+
+  const GoalsScreen({super.key, this.embedded = false});
 
   @override
   State<GoalsScreen> createState() => _GoalsScreenState();
@@ -70,34 +73,62 @@ class _GoalsScreenState extends State<GoalsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final body = _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : TabBarView(
+            controller: _tabController,
+            children: [
+              _buildGoalList(0),
+              _buildGoalList(1),
+              _buildGoalList(2),
+              _buildGoalList(3),
+              _buildGoalList(4),
+            ],
+          );
+
+    final tabBar = TabBar(
+      controller: _tabController,
+      isScrollable: true,
+      tabAlignment: TabAlignment.start,
+      tabs: const [
+        Tab(text: 'All'),
+        Tab(text: 'Corp'),
+        Tab(text: 'Farm'),
+        Tab(text: 'App Dev'),
+        Tab(text: 'Home & Auto'),
+      ],
+    );
+
+    // Embedded mode: no Scaffold, inline "New Goal" button instead of FAB.
+    if (widget.embedded) {
+      return Column(
+        children: [
+          tabBar,
+          Expanded(child: body),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () async {
+                  await Navigator.pushNamed(context, AppRouter.goalForm);
+                  _loadGoals();
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('New Goal'),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Goals'),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabAlignment: TabAlignment.start,
-          tabs: const [
-            Tab(text: 'All'),
-            Tab(text: 'Corp'),
-            Tab(text: 'Farm'),
-            Tab(text: 'App Dev'),
-            Tab(text: 'Home & Auto'),
-          ],
-        ),
+        bottom: tabBar,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildGoalList(0),
-                _buildGoalList(1),
-                _buildGoalList(2),
-                _buildGoalList(3),
-                _buildGoalList(4),
-              ],
-            ),
+      body: body,
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.pushNamed(context, AppRouter.goalForm);

@@ -56,17 +56,19 @@ class ExternalTaskService {
     Uri uri,
     ExternalTaskSource source,
   ) async {
-    final token = await _auth.getAccessToken();
     try {
-      final resp = await http
-          .get(
-            uri,
-            headers: {
-              'Content-Type': 'application/json',
-              if (token != null) 'Authorization': 'Bearer $token',
-            },
-          )
-          .timeout(_timeout);
+      var token = await _auth.getAccessToken();
+      var resp = await _get(uri, token);
+
+      // Retry once with a refreshed token on 401, matching the pattern in
+      // AuthService.authenticatedRequest.
+      if (resp.statusCode == 401) {
+        await _auth.refreshAccessToken();
+        token = await _auth.getAccessToken();
+        if (token != null) {
+          resp = await _get(uri, token);
+        }
+      }
 
       if (resp.statusCode != 200) {
         debugPrint(
@@ -84,5 +86,17 @@ class ExternalTaskService {
       debugPrint('[ExternalTaskService] ${source.name} error: $e');
       return [];
     }
+  }
+
+  Future<http.Response> _get(Uri uri, String? token) {
+    return http
+        .get(
+          uri,
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null) 'Authorization': 'Bearer $token',
+          },
+        )
+        .timeout(_timeout);
   }
 }

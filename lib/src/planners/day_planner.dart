@@ -144,12 +144,17 @@ class DayPlanner {
          notes: notes,
        );
 
-  DayPlanner copyWith({DateTime? date, List<Task>? tasks, String? notes}) {
+  DayPlanner copyWith({
+    DateTime? date,
+    List<Task>? tasks,
+    String? notes,
+    bool clearNotes = false,
+  }) {
     return DayPlanner._(
       id: id,
       date: date ?? this.date,
       tasks: tasks ?? List<Task>.from(this.tasks),
-      notes: notes ?? this.notes,
+      notes: clearNotes ? null : (notes ?? this.notes),
     );
   }
 

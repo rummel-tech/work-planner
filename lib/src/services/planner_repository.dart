@@ -541,7 +541,7 @@ class PlannerRepository {
     final entries = (json['dailyPlannerEntries'] as List? ?? [])
         .cast<Map<String, dynamic>>()
         .map(
-          (e) => DayPlannerEntry.create(
+          (e) => DayPlannerEntry(
             dayOfWeek: e['dayOfWeek'] as int,
             dayPlannerId: e['dayPlannerId'] as String,
           ),
@@ -556,6 +556,9 @@ class PlannerRepository {
     );
   }
 
+  /// Note: dailyPlannerEntries are a client-side linkage maintained in the
+  /// local sembast DB. The API does not store or return them — they are
+  /// populated by the client when day planners are created or loaded.
   WeekPlanner _weekPlannerFromApiJson(
     Map<String, dynamic> json,
     DateTime weekStart,

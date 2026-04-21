@@ -6,8 +6,6 @@ class DayPlannerEntry {
   final String dayPlannerId;
 
   const DayPlannerEntry({required this.dayOfWeek, required this.dayPlannerId});
-
-  DayPlannerEntry.create({required this.dayOfWeek, required this.dayPlannerId});
 }
 
 /// Represents a weekly planner
@@ -51,6 +49,7 @@ class WeekPlanner {
     List<DayPlannerEntry>? dailyPlannerEntries,
     List<String>? weeklyGoals,
     String? notes,
+    bool clearNotes = false,
   }) {
     return WeekPlanner._(
       id: id,
@@ -59,7 +58,7 @@ class WeekPlanner {
           dailyPlannerEntries ??
           List<DayPlannerEntry>.from(this.dailyPlannerEntries),
       weeklyGoals: weeklyGoals ?? List<String>.from(this.weeklyGoals),
-      notes: notes ?? this.notes,
+      notes: clearNotes ? null : (notes ?? this.notes),
     );
   }
 
@@ -73,7 +72,7 @@ class WeekPlanner {
         .where((e) => e.dayOfWeek != dayOfWeek)
         .toList();
     updatedEntries.add(
-      DayPlannerEntry.create(dayOfWeek: dayOfWeek, dayPlannerId: dayPlannerId),
+      DayPlannerEntry(dayOfWeek: dayOfWeek, dayPlannerId: dayPlannerId),
     );
     return copyWith(dailyPlannerEntries: updatedEntries);
   }

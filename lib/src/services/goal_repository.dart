@@ -81,14 +81,12 @@ class GoalRepository {
     final api = _api;
     if (api != null) {
       try {
-        final inProgress = await api.getGoals(
-          status: GoalStatus.inProgress.name,
-        );
-        final notStarted = await api.getGoals(
-          status: GoalStatus.notStarted.name,
-        );
+        final results = await Future.wait([
+          api.getGoals(status: GoalStatus.inProgress.name),
+          api.getGoals(status: GoalStatus.notStarted.name),
+        ]);
         ConnectivityNotifier.setOffline(false);
-        final goals = [...inProgress, ...notStarted].map(_fromApiJson).toList();
+        final goals = [...results[0], ...results[1]].map(_fromApiJson).toList();
         await _syncToDb(goals);
         return goals;
       } catch (e) {

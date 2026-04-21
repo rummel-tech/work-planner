@@ -74,8 +74,10 @@ class Plan {
     return copyWith(steps: [...steps, step]);
   }
 
-  Plan removeStep(String step) {
-    return copyWith(steps: steps.where((s) => s != step).toList());
+  Plan removeStepAt(int index) {
+    final updated = List<String>.from(steps);
+    updated.removeAt(index);
+    return copyWith(steps: updated);
   }
 
   @override
