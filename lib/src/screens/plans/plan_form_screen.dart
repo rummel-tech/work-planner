@@ -2,7 +2,7 @@ import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/plan.dart';
-
+import '../../utils/enum_labels.dart';
 class PlanFormScreen extends StatefulWidget {
   final Plan? plan;
   final String? goalId;
@@ -22,6 +22,7 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
   PlanStatus _status = PlanStatus.draft;
   DateTime? _startDate;
   DateTime? _endDate;
+  bool _saving = false;
 
   bool get _isEditing => widget.plan != null;
 
@@ -85,32 +86,48 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
 
   Future<void> _savePlan() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_saving) return;
 
-    Plan plan;
-    if (_isEditing) {
-      plan = widget.plan!.copyWith(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        status: _status,
-        startDate: _startDate,
-        clearStartDate: _startDate == null,
-        endDate: _endDate,
-        clearEndDate: _endDate == null,
-      );
-    } else {
-      plan = Plan.create(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        goalId: widget.goalId!,
-        status: _status,
-        startDate: _startDate,
-        endDate: _endDate,
-      );
-    }
+    setState(() => _saving = true);
 
-    await _planRepository.save(plan);
-    if (mounted) {
-      Navigator.pop(context);
+    try {
+      Plan plan;
+      if (_isEditing) {
+        plan = widget.plan!.copyWith(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          status: _status,
+          startDate: _startDate,
+          clearStartDate: _startDate == null,
+          endDate: _endDate,
+          clearEndDate: _endDate == null,
+        );
+      } else {
+        final goalId = widget.goalId;
+        if (goalId == null) {
+          throw StateError('goalId is required when creating a new plan');
+        }
+        plan = Plan.create(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          goalId: goalId,
+          status: _status,
+          startDate: _startDate,
+          endDate: _endDate,
+        );
+      }
+
+      await _planRepository.save(plan);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save plan: $e')),
+        );
+      }
     }
   }
 
@@ -168,7 +185,7 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
                 spacing: 8,
                 children: PlanStatus.values.map((status) {
                   return ChoiceChip(
-                    label: Text(_statusLabel(status)),
+                    label: Text(status.label),
                     selected: _status == status,
                     onSelected: (_) {
                       setState(() {
@@ -277,8 +294,14 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: _savePlan,
-                  child: Text(_isEditing ? 'Save Changes' : 'Create Plan'),
+                  onPressed: _saving ? null : _savePlan,
+                  child: _saving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(_isEditing ? 'Save Changes' : 'Create Plan'),
                 ),
               ),
             ],
@@ -286,18 +309,5 @@ class _PlanFormScreenState extends State<PlanFormScreen> {
         ),
       ),
     );
-  }
-
-  String _statusLabel(PlanStatus status) {
-    switch (status) {
-      case PlanStatus.draft:
-        return 'Draft';
-      case PlanStatus.active:
-        return 'Active';
-      case PlanStatus.completed:
-        return 'Completed';
-      case PlanStatus.cancelled:
-        return 'Cancelled';
-    }
   }
 }

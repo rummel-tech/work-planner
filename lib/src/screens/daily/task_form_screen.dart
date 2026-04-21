@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../planners/day_planner.dart';
 import '../../models/plan.dart';
-
+import '../../utils/enum_labels.dart';
 class TaskFormScreen extends StatefulWidget {
   final Task? task;
   final DateTime date;
@@ -41,6 +41,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
   bool get _isEditing => widget.task != null;
   bool get _isCorporate => _taskCategory == TaskCategory.corporate;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -98,58 +99,70 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
   Future<void> _saveTask() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_saving) return;
 
-    DateTime? scheduledDateTime;
-    if (_scheduledTime != null) {
-      scheduledDateTime = DateTime(
-        widget.date.year,
-        widget.date.month,
-        widget.date.day,
-        _scheduledTime!.hour,
-        _scheduledTime!.minute,
-      );
-    }
+    setState(() => _saving = true);
 
-    // Pomodoro block only applies to corporate tasks
-    final effectiveBlock = _isCorporate ? _pomodoroBlock : null;
+    try {
+      DateTime? scheduledDateTime;
+      if (_scheduledTime != null) {
+        scheduledDateTime = DateTime(
+          widget.date.year,
+          widget.date.month,
+          widget.date.day,
+          _scheduledTime!.hour,
+          _scheduledTime!.minute,
+        );
+      }
 
-    if (_isEditing) {
-      final updatedTask = widget.task!.copyWith(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim().isEmpty
-            ? null
-            : _descriptionController.text.trim(),
-        clearDescription: _descriptionController.text.trim().isEmpty,
-        priority: _priority,
-        scheduledTime: scheduledDateTime,
-        clearScheduledTime: scheduledDateTime == null,
-        durationMinutes: _durationMinutes,
-        clearDurationMinutes: _durationMinutes == null,
-        planId: _planId,
-        clearPlanId: _planId == null,
-        pomodoroBlock: effectiveBlock,
-        clearPomodoroBlock: effectiveBlock == null,
-        taskCategory: _taskCategory,
-      );
-      await _plannerRepository.updateTask(widget.date, updatedTask);
-    } else {
-      final newTask = Task.create(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim().isEmpty
-            ? null
-            : _descriptionController.text.trim(),
-        priority: _priority,
-        scheduledTime: scheduledDateTime,
-        durationMinutes: _durationMinutes,
-        planId: _planId,
-        pomodoroBlock: effectiveBlock,
-        taskCategory: _taskCategory,
-      );
-      await _plannerRepository.addTask(widget.date, newTask);
-    }
+      // Pomodoro block only applies to corporate tasks
+      final effectiveBlock = _isCorporate ? _pomodoroBlock : null;
 
-    if (mounted) {
-      Navigator.pop(context);
+      if (_isEditing) {
+        final updatedTask = widget.task!.copyWith(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim().isEmpty
+              ? null
+              : _descriptionController.text.trim(),
+          clearDescription: _descriptionController.text.trim().isEmpty,
+          priority: _priority,
+          scheduledTime: scheduledDateTime,
+          clearScheduledTime: scheduledDateTime == null,
+          durationMinutes: _durationMinutes,
+          clearDurationMinutes: _durationMinutes == null,
+          planId: _planId,
+          clearPlanId: _planId == null,
+          pomodoroBlock: effectiveBlock,
+          clearPomodoroBlock: effectiveBlock == null,
+          taskCategory: _taskCategory,
+        );
+        await _plannerRepository.updateTask(widget.date, updatedTask);
+      } else {
+        final newTask = Task.create(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim().isEmpty
+              ? null
+              : _descriptionController.text.trim(),
+          priority: _priority,
+          scheduledTime: scheduledDateTime,
+          durationMinutes: _durationMinutes,
+          planId: _planId,
+          pomodoroBlock: effectiveBlock,
+          taskCategory: _taskCategory,
+        );
+        await _plannerRepository.addTask(widget.date, newTask);
+      }
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save task: $e')),
+        );
+      }
     }
   }
 
@@ -160,16 +173,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     return '$hour:$minute $period';
   }
 
-  String _categoryLabel(TaskCategory cat) {
-    switch (cat) {
-      case TaskCategory.corporate:
-        return 'Corporate';
-      case TaskCategory.farm:
-        return 'Farm';
-      case TaskCategory.appDevelopment:
-        return 'App Dev';
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +196,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                     .map(
                       (cat) => ButtonSegment(
                         value: cat,
-                        label: Text(_categoryLabel(cat)),
+                        label: Text(cat.label),
                       ),
                     )
                     .toList(),
@@ -443,8 +447,14 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: _saveTask,
-                  child: Text(_isEditing ? 'Save Changes' : 'Create Task'),
+                  onPressed: _saving ? null : _saveTask,
+                  child: _saving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(_isEditing ? 'Save Changes' : 'Create Task'),
                 ),
               ),
             ],

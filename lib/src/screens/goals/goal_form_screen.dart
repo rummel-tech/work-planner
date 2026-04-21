@@ -2,6 +2,8 @@ import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/goal.dart';
+import '../../utils/enum_labels.dart';
+import '../../utils/format_helpers.dart';
 
 class GoalFormScreen extends StatefulWidget {
   final Goal? goal;
@@ -21,6 +23,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
   GoalType _type = GoalType.corporate;
   GoalStatus _status = GoalStatus.notStarted;
   DateTime? _targetDate;
+  bool _saving = false;
 
   bool get _isEditing => widget.goal != null;
 
@@ -62,62 +65,46 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
 
   Future<void> _saveGoal() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_saving) return;
 
-    Goal goal;
-    if (_isEditing) {
-      goal = widget.goal!.copyWith(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        type: _type,
-        status: _status,
-        targetDate: _targetDate,
-        clearTargetDate: _targetDate == null,
-      );
-    } else {
-      goal = Goal.create(
-        title: _titleController.text.trim(),
-        description: _descriptionController.text.trim(),
-        type: _type,
-        status: _status,
-        targetDate: _targetDate,
-      );
-    }
+    setState(() => _saving = true);
 
-    await _goalRepository.save(goal);
-    if (mounted) {
-      Navigator.pop(context);
-    }
-  }
+    try {
+      Goal goal;
+      if (_isEditing) {
+        goal = widget.goal!.copyWith(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          type: _type,
+          status: _status,
+          targetDate: _targetDate,
+          clearTargetDate: _targetDate == null,
+        );
+      } else {
+        goal = Goal.create(
+          title: _titleController.text.trim(),
+          description: _descriptionController.text.trim(),
+          type: _type,
+          status: _status,
+          targetDate: _targetDate,
+        );
+      }
 
-  String _formatDate(DateTime date) {
-    return '${date.month}/${date.day}/${date.year}';
-  }
-
-  String _typeLabel(GoalType type) {
-    switch (type) {
-      case GoalType.corporate:
-        return 'Corporate';
-      case GoalType.farm:
-        return 'Farm';
-      case GoalType.appDevelopment:
-        return 'App Dev';
-      case GoalType.homeAuto:
-        return 'Home & Auto';
+      await _goalRepository.save(goal);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save goal: $e')),
+        );
+      }
     }
   }
 
-  IconData _typeIcon(GoalType type) {
-    switch (type) {
-      case GoalType.corporate:
-        return Icons.business;
-      case GoalType.farm:
-        return Icons.agriculture;
-      case GoalType.appDevelopment:
-        return Icons.code;
-      case GoalType.homeAuto:
-        return Icons.home;
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -173,9 +160,9 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                     value: type,
                     child: Row(
                       children: [
-                        Icon(_typeIcon(type), size: 18),
+                        Icon(type.icon, size: 18),
                         const SizedBox(width: 8),
-                        Text(_typeLabel(type)),
+                        Text(type.label),
                       ],
                     ),
                   );
@@ -191,7 +178,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                 spacing: 8,
                 children: GoalStatus.values.map((status) {
                   return ChoiceChip(
-                    label: Text(_statusLabel(status)),
+                    label: Text(status.label),
                     selected: _status == status,
                     onSelected: (_) {
                       setState(() {
@@ -209,7 +196,7 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
                 leading: const Icon(Icons.calendar_today),
                 title: Text(
                   _targetDate != null
-                      ? _formatDate(_targetDate!)
+                      ? formatDate(_targetDate)
                       : 'No date selected',
                 ),
                 trailing: Row(
@@ -235,8 +222,14 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: _saveGoal,
-                  child: Text(_isEditing ? 'Save Changes' : 'Create Goal'),
+                  onPressed: _saving ? null : _saveGoal,
+                  child: _saving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(_isEditing ? 'Save Changes' : 'Create Goal'),
                 ),
               ),
             ],
@@ -244,18 +237,5 @@ class _GoalFormScreenState extends State<GoalFormScreen> {
         ),
       ),
     );
-  }
-
-  String _statusLabel(GoalStatus status) {
-    switch (status) {
-      case GoalStatus.notStarted:
-        return 'Not Started';
-      case GoalStatus.inProgress:
-        return 'In Progress';
-      case GoalStatus.completed:
-        return 'Completed';
-      case GoalStatus.abandoned:
-        return 'Abandoned';
-    }
   }
 }
