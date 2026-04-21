@@ -9,7 +9,14 @@ import '../../navigation/app_router.dart';
 class DayPlannerScreen extends StatefulWidget {
   final DateTime date;
 
-  const DayPlannerScreen({super.key, required this.date});
+  /// When true, suppresses Scaffold/AppBar/FAB for embedding in a parent shell.
+  final bool embedded;
+
+  const DayPlannerScreen({
+    super.key,
+    required this.date,
+    this.embedded = false,
+  });
 
   @override
   State<DayPlannerScreen> createState() => _DayPlannerScreenState();
@@ -106,74 +113,96 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
     final completedCount = _planner?.completedTasks.length ?? 0;
     final completionRate = _planner?.completionRate ?? 0.0;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(_isToday ? 'Today' : _formatDate())),
-      body: RefreshIndicator(
-        onRefresh: _loadPlanner,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Row(
-                children: [
-                  CompletionIndicator(rate: completionRate, size: 56),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(_formatDate(), style: theme.textTheme.titleMedium),
-                        const SizedBox(height: 4),
-                        Text(
-                          tasks.isEmpty
-                              ? 'No tasks'
-                              : '$completedCount of ${tasks.length} tasks completed',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.outline,
-                          ),
+    final content = RefreshIndicator(
+      onRefresh: _loadPlanner,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              children: [
+                CompletionIndicator(rate: completionRate, size: 56),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_formatDate(), style: theme.textTheme.titleMedium),
+                      const SizedBox(height: 4),
+                      Text(
+                        tasks.isEmpty
+                            ? 'No tasks'
+                            : '$completedCount of ${tasks.length} tasks completed',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.outline,
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          for (int block = 1; block <= 4; block++)
+            _buildBlock(
+              block,
+              tasks.where((t) => t.pomodoroBlock == block).toList(),
+              theme,
+            ),
+          _buildUnassignedBlock(
+            tasks.where((t) => t.pomodoroBlock == null).toList(),
+            theme,
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Notes', style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _notesController,
+                    decoration: const InputDecoration(
+                      hintText: 'Add notes for this day...',
+                      border: OutlineInputBorder(),
                     ),
+                    maxLines: 3,
+                    onChanged: (_) => _saveNotes(),
                   ),
                 ],
               ),
             ),
-            for (int block = 1; block <= 4; block++)
-              _buildBlock(
-                block,
-                tasks.where((t) => t.pomodoroBlock == block).toList(),
-                theme,
-              ),
-            _buildUnassignedBlock(
-              tasks.where((t) => t.pomodoroBlock == null).toList(),
-              theme,
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Notes', style: theme.textTheme.titleSmall),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _notesController,
-                      decoration: const InputDecoration(
-                        hintText: 'Add notes for this day...',
-                        border: OutlineInputBorder(),
-                      ),
-                      maxLines: 3,
-                      onChanged: (_) => _saveNotes(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+
+    // Embedded mode: no Scaffold/AppBar/FAB — inline add button at bottom.
+    if (widget.embedded) {
+      return Column(
+        children: [
+          Expanded(child: content),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => _addTaskToBlock(null),
+                icon: const Icon(Icons.add),
+                label: const Text('Add Task'),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: Text(_isToday ? 'Today' : _formatDate())),
+      body: content,
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addTaskToBlock(null),
         child: const Icon(Icons.add),

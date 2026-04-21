@@ -9,7 +9,14 @@ import '../../navigation/app_router.dart';
 class WeeklyPlannerScreen extends StatefulWidget {
   final DateTime? initialWeekStart;
 
-  const WeeklyPlannerScreen({super.key, this.initialWeekStart});
+  /// When true, suppresses Scaffold/AppBar for embedding in a parent shell.
+  final bool embedded;
+
+  const WeeklyPlannerScreen({
+    super.key,
+    this.initialWeekStart,
+    this.embedded = false,
+  });
 
   @override
   State<WeeklyPlannerScreen> createState() => _WeeklyPlannerScreenState();
@@ -171,15 +178,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Weekly Planner'),
-        actions: [
-          if (!_isCurrentWeek())
-            TextButton(onPressed: _goToToday, child: const Text('Today')),
-        ],
-      ),
-      body: RefreshIndicator(
+    final content = RefreshIndicator(
         onRefresh: _loadWeekPlanner,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -406,6 +405,22 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
           ),
         ),
       ),
+    );
+
+    // Embedded mode: no Scaffold/AppBar.
+    if (widget.embedded) {
+      return content;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Weekly Planner'),
+        actions: [
+          if (!_isCurrentWeek())
+            TextButton(onPressed: _goToToday, child: const Text('Today')),
+        ],
+      ),
+      body: content,
     );
   }
 }
