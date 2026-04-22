@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
   final _plannerRepository = ServiceLocator.planners;
   DayPlanner? _planner;
   final _notesController = TextEditingController();
+  Timer? _notesDebounce;
 
   @override
   void initState() {
@@ -35,6 +37,7 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
 
   @override
   void dispose() {
+    _notesDebounce?.cancel();
     _notesController.dispose();
     super.dispose();
   }
@@ -58,6 +61,13 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
     if (_planner == null) return;
     await _plannerRepository.removeTask(widget.date, task.id);
     _loadPlanner();
+  }
+
+  void _onNotesChanged(String value) {
+    if (_notesDebounce?.isActive ?? false) _notesDebounce!.cancel();
+    _notesDebounce = Timer(const Duration(milliseconds: 500), () {
+      _saveNotes();
+    });
   }
 
   Future<void> _saveNotes() async {
@@ -170,7 +180,7 @@ class _DayPlannerScreenState extends State<DayPlannerScreen> {
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 3,
-                    onChanged: (_) => _saveNotes(),
+                    onChanged: _onNotesChanged,
                   ),
                 ],
               ),

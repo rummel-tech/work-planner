@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/plan.dart';
+import '../utils/format_helpers.dart';
 import 'status_chip.dart';
 
 class PlanCard extends StatelessWidget {
@@ -9,18 +10,6 @@ class PlanCard extends StatelessWidget {
 
   const PlanCard({super.key, required this.plan, this.onTap});
 
-  String _formatDateRange() {
-    if (plan.startDate == null && plan.endDate == null) {
-      return 'No dates set';
-    }
-    final start = plan.startDate != null
-        ? '${plan.startDate!.month}/${plan.startDate!.day}'
-        : '?';
-    final end = plan.endDate != null
-        ? '${plan.endDate!.month}/${plan.endDate!.day}'
-        : '?';
-    return '$start - $end';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +61,7 @@ class PlanCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    _formatDateRange(),
+                    formatDateRange(plan.startDate, plan.endDate),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.outline,
                     ),

@@ -6,11 +6,12 @@
 /// - Create plans to achieve those goals
 /// - Plan daily tasks with DayPlanner
 /// - Plan weekly tasks with WeekPlanner
-library artemis_work_planner;
+
 
 // Models
 export 'src/models/goal.dart';
 export 'src/models/plan.dart';
+export 'src/models/external_task.dart';
 export 'src/planners/day_planner.dart';
 export 'src/planners/week_planner.dart';
 
@@ -24,6 +25,11 @@ export 'src/services/plan_repository.dart';
 export 'src/services/planner_repository.dart';
 export 'src/services/service_locator.dart';
 export 'src/services/connectivity_notifier.dart';
+export 'src/services/external_task_service.dart';
+
+// Utils
+export 'src/utils/enum_labels.dart';
+export 'src/utils/format_helpers.dart';
 
 // Navigation
 export 'src/navigation/app_router.dart';

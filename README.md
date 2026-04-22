@@ -34,54 +34,52 @@ dart pub get
 import 'package:artemis_work_planner/artemis_work_planner.dart';
 
 // Create a corporate goal
-final corporateGoal = Goal(
+final corporateGoal = Goal.create(
   title: 'Launch Product X',
   description: 'Successfully launch our new product line',
   type: GoalType.corporate,
   targetDate: DateTime(2026, 6, 30),
 );
 
-// Create an entrepreneurial goal
-final entrepreneurialGoal = Goal(
-  title: 'Start Consulting Business',
-  description: 'Launch independent consulting practice',
-  type: GoalType.entrepreneurial,
+// Create an entrepreneurial/side-hustle goal
+final appDevGoal = Goal.create(
+  title: 'Start App Business',
+  description: 'Launch independent app development practice',
+  type: GoalType.appDevelopment,
 );
 ```
 
 ### Creating Plans
 
 ```dart
-final plan = Plan(
+final plan = Plan.create(
   title: 'Product Launch Plan',
   description: 'Detailed plan for product launch',
   goalId: corporateGoal.id,
   startDate: DateTime(2026, 3, 1),
   endDate: DateTime(2026, 6, 30),
-  steps: [
-    'Finalize specifications',
-    'Complete development',
-    'Conduct testing',
-    'Launch to market',
-  ],
   status: PlanStatus.active,
-);
+).addStep('Finalize specifications')
+ .addStep('Complete development')
+ .addStep('Conduct testing')
+ .addStep('Launch to market');
 ```
 
 ### Using Day Planner
 
 ```dart
-var dayPlanner = DayPlanner(
+var dayPlanner = DayPlanner.create(
   date: DateTime.now(),
   notes: 'Focus on important tasks',
 );
 
 // Add tasks
-dayPlanner = dayPlanner.addTask(Task(
+dayPlanner = dayPlanner.addTask(Task.create(
   title: 'Team meeting',
   scheduledTime: DateTime(2026, 1, 20, 10, 0),
   durationMinutes: 60,
   priority: TaskPriority.high,
+  taskCategory: TaskCategory.corporate,
 ));
 
 // Mark task as completed
@@ -96,17 +94,22 @@ print('Completion Rate: ${dayPlanner.completionRate}');
 ### Using Week Planner
 
 ```dart
-var weekPlanner = WeekPlanner(
+var weekPlanner = WeekPlanner.create(
   weekStartDate: DateTime(2026, 1, 19),
+).copyWith(
   weeklyGoals: [
     'Complete sprint',
     'Prepare presentation',
   ],
 );
 
-// Add daily planners
-weekPlanner = weekPlanner.addDailyPlanner(0, mondayPlanner);
-weekPlanner = weekPlanner.addDailyPlanner(1, tuesdayPlanner);
+// Add daily planners (assuming Monday/Tuesday planner IDs exist)
+weekPlanner = weekPlanner.addDailyPlannerEntry(
+  DayPlannerEntry(dayIndex: 0, dayPlannerId: mondayPlannerId)
+);
+weekPlanner = weekPlanner.addDailyPlannerEntry(
+  DayPlannerEntry(dayIndex: 1, dayPlannerId: tuesdayPlannerId)
+);
 
 // Track weekly progress
 print('Week Completion: ${weekPlanner.weekCompletionRate}');

@@ -6,6 +6,8 @@ import '../../planners/day_planner.dart';
 import '../../ui_components/status_chip.dart';
 import '../../ui_components/task_tile.dart';
 import '../../navigation/app_router.dart';
+import '../../utils/enum_labels.dart';
+import '../../utils/format_helpers.dart';
 
 class PlanDetailScreen extends StatefulWidget {
   final Plan plan;
@@ -101,7 +103,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     }
   }
 
-  Future<void> _removeStep(String step) async {
+  Future<void> _removeStepAt(int index) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -121,7 +123,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     );
 
     if (confirm == true) {
-      final updated = _plan.removeStep(step);
+      final updated = _plan.removeStepAt(index);
       await _planRepository.save(updated);
       setState(() {
         _plan = updated;
@@ -173,10 +175,6 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     _loadLinkedTasks();
   }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'Not set';
-    return '${date.month}/${date.day}/${date.year}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +242,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Start: ${_formatDate(_plan.startDate)}',
+                            'Start: ${formatDate(_plan.startDate)}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.outline,
                             ),
@@ -257,7 +255,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'End: ${_formatDate(_plan.endDate)}',
+                            'End: ${formatDate(_plan.endDate)}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.outline,
                             ),
@@ -338,7 +336,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                   itemBuilder: (context, index) {
                     final step = _plan.steps[index];
                     return Card(
-                      key: ValueKey(step),
+                      key: ValueKey('step_$index'),
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: theme.colorScheme.primaryContainer,
@@ -347,7 +345,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                         title: Text(step),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline),
-                          onPressed: () => _removeStep(step),
+                          onPressed: () => _removeStepAt(index),
                         ),
                       ),
                     );
@@ -392,16 +390,4 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     );
   }
 
-  String _statusLabel(PlanStatus status) {
-    switch (status) {
-      case PlanStatus.draft:
-        return 'Draft';
-      case PlanStatus.active:
-        return 'Active';
-      case PlanStatus.completed:
-        return 'Completed';
-      case PlanStatus.cancelled:
-        return 'Cancelled';
-    }
-  }
 }

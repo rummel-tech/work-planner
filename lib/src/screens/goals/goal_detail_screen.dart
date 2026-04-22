@@ -6,6 +6,10 @@ import '../../models/plan.dart';
 import '../../ui_components/plan_card.dart';
 import '../../ui_components/status_chip.dart';
 import '../../navigation/app_router.dart';
+import '../../utils/enum_labels.dart';
+import '../../utils/format_helpers.dart';
+import '../../ui_components/status_chip.dart';
+import '../../navigation/app_router.dart';
 
 class GoalDetailScreen extends StatefulWidget {
   final Goal goal;
@@ -81,36 +85,6 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     }
   }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'No target date';
-    return '${date.month}/${date.day}/${date.year}';
-  }
-
-  IconData get _typeIcon {
-    switch (_goal.type) {
-      case GoalType.corporate:
-        return Icons.business;
-      case GoalType.farm:
-        return Icons.agriculture;
-      case GoalType.appDevelopment:
-        return Icons.code;
-      case GoalType.homeAuto:
-        return Icons.home;
-    }
-  }
-
-  String get _typeLabel {
-    switch (_goal.type) {
-      case GoalType.corporate:
-        return 'Corporate';
-      case GoalType.farm:
-        return 'Farm';
-      case GoalType.appDevelopment:
-        return 'App Dev';
-      case GoalType.homeAuto:
-        return 'Home & Auto';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,10 +127,10 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(_typeIcon, color: theme.colorScheme.primary),
+                          Icon(_goal.type.icon, color: theme.colorScheme.primary),
                           const SizedBox(width: 8),
                           Text(
-                            _typeLabel,
+                            _goal.type.label,
                             style: theme.textTheme.labelLarge?.copyWith(
                               color: theme.colorScheme.primary,
                             ),
@@ -189,7 +163,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Target: ${_formatDate(_goal.targetDate)}',
+                            'Target: ${_goal.targetDate == null ? 'No target date' : formatDate(_goal.targetDate)}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.outline,
                             ),
@@ -206,7 +180,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Created: ${_formatDate(_goal.createdAt)}',
+                            'Created: ${formatDate(_goal.createdAt)}',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.outline,
                             ),
@@ -225,7 +199,7 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
                 children: GoalStatus.values.map((status) {
                   final isSelected = _goal.status == status;
                   return ChoiceChip(
-                    label: Text(_statusLabel(status)),
+                    label: Text(status.label),
                     selected: isSelected,
                     onSelected: (_) => _updateStatus(status),
                   );
@@ -317,16 +291,4 @@ class _GoalDetailScreenState extends State<GoalDetailScreen> {
     );
   }
 
-  String _statusLabel(GoalStatus status) {
-    switch (status) {
-      case GoalStatus.notStarted:
-        return 'Not Started';
-      case GoalStatus.inProgress:
-        return 'In Progress';
-      case GoalStatus.completed:
-        return 'Completed';
-      case GoalStatus.abandoned:
-        return 'Abandoned';
-    }
-  }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import '../../services/service_locator.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
   final _plannerRepository = ServiceLocator.planners;
   final _goalController = TextEditingController();
   final _notesController = TextEditingController();
+  Timer? _notesDebounce;
   WeekPlanner? _weekPlanner;
   Map<int, DayPlanner> _dayPlanners = {};
   late DateTime _currentWeekStart;
@@ -40,6 +42,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
 
   @override
   void dispose() {
+    _notesDebounce?.cancel();
     _goalController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -148,6 +151,13 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
       updatedGoals,
     );
     _loadWeekPlanner();
+  }
+
+  void _onNotesChanged(String value) {
+    if (_notesDebounce?.isActive ?? false) _notesDebounce!.cancel();
+    _notesDebounce = Timer(const Duration(milliseconds: 500), () {
+      _saveNotes();
+    });
   }
 
   Future<void> _saveNotes() async {
@@ -323,7 +333,7 @@ class _WeeklyPlannerScreenState extends State<WeeklyPlannerScreen> {
                             border: OutlineInputBorder(),
                           ),
                           maxLines: 3,
-                          onChanged: (_) => _saveNotes(),
+                          onChanged: _onNotesChanged,
                         ),
                       ],
                     ),

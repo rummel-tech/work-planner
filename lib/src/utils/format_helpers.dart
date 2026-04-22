@@ -9,6 +9,16 @@ String formatDate(DateTime? date, {String fallback = 'Not set'}) {
   return '${date.month}/${date.day}/${date.year}';
 }
 
+/// Formats a date range `M/D - M/D`
+String formatDateRange(DateTime? start, DateTime? end) {
+  if (start == null && end == null) {
+    return 'No dates set';
+  }
+  final startStr = start != null ? '${start.month}/${start.day}' : '?';
+  final endStr = end != null ? '${end.month}/${end.day}' : '?';
+  return '$startStr - $endStr';
+}
+
 /// Formats a [DateTime] as `H:MM AM/PM`.
 String formatTime(DateTime? time) {
   if (time == null) return '';
