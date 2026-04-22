@@ -86,21 +86,21 @@ void main() {
         expect(p.steps, equals(['step 1']));
       });
 
-      test('removeStep removes matching step', () {
+      test('removeStepAt removes matching step', () {
         final p = makePlan(steps: ['a', 'b', 'c']);
-        expect(p.removeStep('b').steps, equals(['a', 'c']));
+        expect(p.removeStepAt(1).steps, equals(['a', 'c']));
       });
 
-      test('removeStep does nothing for non-existent step', () {
+      test('removeStepAt throws for invalid index', () {
         final p = makePlan(steps: ['a']);
-        expect(p.removeStep('z').steps, equals(['a']));
+        expect(() => p.removeStepAt(5), throwsRangeError);
       });
 
       test('steps can be chained', () {
         final p = makePlan()
             .addStep('first')
             .addStep('second')
-            .removeStep('first');
+            .removeStepAt(0);
         expect(p.steps, equals(['second']));
       });
     });
