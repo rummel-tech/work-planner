@@ -6,6 +6,7 @@ import 'database_service.dart';
 import 'api_service.dart';
 import 'connectivity_notifier.dart';
 
+/// Feature: goal-management
 class GoalRepository {
   final _store = stringMapStoreFactory.store('goals');
   Database get _db => DatabaseService.instance.db;

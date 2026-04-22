@@ -76,7 +76,7 @@ void main() {
   // Goal creation flow
   // -------------------------------------------------------------------------
 
-  group('Goal creation flow', () {
+  group('Goal creation flow [goal-management]', () {
     testWidgets('creates a goal via Goals tab → New Goal form', (tester) async {
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();
@@ -125,7 +125,7 @@ void main() {
   // Task creation flow (Today tab)
   // -------------------------------------------------------------------------
 
-  group('Task creation flow', () {
+  group('Task creation flow [focused-execution]', () {
     testWidgets('adds a task from the Today tab', (tester) async {
       await tester.pumpWidget(buildApp());
       await tester.pumpAndSettle();

@@ -9,6 +9,7 @@ class DayPlannerEntry {
 }
 
 /// Represents a weekly planner
+/// Feature: weekly-momentum
 class WeekPlanner {
   final String id;
   final DateTime weekStartDate;

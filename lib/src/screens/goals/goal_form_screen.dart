@@ -5,6 +5,7 @@ import '../../models/goal.dart';
 import '../../utils/enum_labels.dart';
 import '../../utils/format_helpers.dart';
 
+/// Feature: goal-management
 class GoalFormScreen extends StatefulWidget {
   final Goal? goal;
 
