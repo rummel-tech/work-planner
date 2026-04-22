@@ -1,7 +1,7 @@
-/// Shared date and time formatting utilities.
-///
-/// These replace the many `_formatDate` / `_formatTime` helpers that were
-/// duplicated across screens.
+// Shared date and time formatting utilities.
+//
+// These replace the many `_formatDate` / `_formatTime` helpers that were
+// duplicated across screens.
 
 /// Formats a [DateTime] as `M/D/YYYY`. Returns [fallback] if null.
 String formatDate(DateTime? date, {String fallback = 'Not set'}) {

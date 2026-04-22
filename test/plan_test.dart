@@ -79,7 +79,7 @@ void main() {
         steps: ['Step 1', 'Step 2', 'Step 3'],
       );
 
-      final updatedPlan = plan.removeStep('Step 2');
+      final updatedPlan = plan.removeStepAt(1);
 
       expect(updatedPlan.steps.length, 2);
       expect(updatedPlan.steps, isNot(contains('Step 2')));

@@ -46,7 +46,7 @@ void main() {
 
     testWidgets('shows task in correct block after seeding', (tester) async {
       // Seed a task in block 2 via the fake repository
-      final planner = await fakePlanners.getOrCreateDayPlanner(testDate);
+      await fakePlanners.getOrCreateDayPlanner(testDate);
       final task = Task.create(title: 'Block 2 Task', pomodoroBlock: 2);
       await fakePlanners.addTask(testDate, task);
 

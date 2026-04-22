@@ -31,7 +31,7 @@ class FakeAuthService extends AuthService {
       _authenticated = true;
       return {'status': 'ok'};
     }
-    throw AuthException('Invalid credentials');
+    throw const AuthException('Invalid credentials');
   }
 
   @override
